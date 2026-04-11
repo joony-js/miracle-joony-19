@@ -225,7 +225,12 @@
 
         for(let i=1; i<=30; i++) {
             const dS = `2026-04-${String(i).padStart(2,'0')}`;
-            const yo = YOS[new Date(2026, 3, i).getDay()];
+            const yoNum = new Date(2026, 3, i).getDay();
+            const yo = YOS[yoNum];
+            
+            // 토요일(6) 파란색, 일요일(0) 빨간색 적용
+            const yoColor = (yoNum === 6) ? 'blue' : (yoNum === 0 ? 'red' : '#333');
+            
             let dO = 0, dP = 0;
             MEMBERS[name].items.forEach(r => {
                 const s = getS(name, dS, r);
@@ -237,7 +242,7 @@
             grid.innerHTML += `
                 <div class="day-cell" style="background:${color}" onclick="openModal('${name}','${dS}')">
                     <div class="day-num">${i}일</div>
-                    <div class="day-yo">(${yo})</div>
+                    <div class="day-yo" style="color:${yoColor}">(${yo})</div>
                 </div>`;
         }
         const total = (curD * MEMBERS[name].items.length) - pC;
