@@ -28,24 +28,21 @@
         .btn.X.active { background: var(--no); color: #fff; border-color: var(--no); }
         .btn.P.active { background: var(--etc); color: #fff; border-color: var(--etc); }
 
-        /* 성적표 그리드 */
         .grid-container { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 10px; }
-        .day-cell { aspect-ratio: 1; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; border: 1px solid #eee; cursor: pointer; position: relative; }
+        .day-cell { aspect-ratio: 1; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; border: 1px solid #eee; cursor: pointer; background: #fff; }
         .day-num { font-size: 14px; margin-bottom: 2px; }
         .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #ddd; }
 
-        /* 관리자 현황판 (기존 표 복구) */
-        .admin-table-wrapper { overflow-x: auto; margin-top: 10px; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 800px; }
-        th, td { border: 1px solid #ddd; padding: 8px 4px; text-align: center; font-weight: 700; }
-        th { background: #f8f8f8; position: sticky; top: 0; }
-        .sticky-col { position: sticky; left: 0; background: #fff; z-index: 2; border-right: 2px solid var(--main); }
+        .admin-table-wrapper { overflow-x: auto; margin-top: 10px; border-radius: 10px; border: 1px solid #ddd; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 900px; background: #fff; }
+        th, td { border: 1px solid #ddd; padding: 8px 2px; text-align: center; font-weight: 700; height: 40px; }
+        th { background: #f8f8f8; position: sticky; top: 0; z-index: 10; }
+        .sticky-col { position: sticky; left: 0; background: #fff; z-index: 5; border-right: 2px solid var(--main) !important; width: 60px; }
 
-        /* 모달 팝업 */
-        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-body { background: #fff; width: 85%; border-radius: 20px; padding: 25px; max-height: 80%; overflow-y: auto; }
+        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; }
+        .modal-body { background: #fff; width: 90%; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         
-        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 12px 25px; border-radius: 30px; font-size: 14px; display: none; z-index: 2000; }
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 12px 25px; border-radius: 30px; font-size: 14px; display: none; z-index: 20000; }
     </style>
     <script src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
@@ -62,23 +59,21 @@
         <select class="select-box" id="userSelect" onchange="loadUser()">
             <option value="">이름을 선택하세요</option>
         </select>
-        
         <div id="userDetail" style="display:none;">
             <div class="card">
                 <div class="card-title"><span id="display-name"></span> <span id="display-rate" style="color:var(--main); font-size:16px;"></span></div>
                 <div id="routine-list"></div>
             </div>
             <div class="card">
-                <div class="card-title">4월 상세 성적표 📅</div>
-                <p style="font-size:13px; color:#666; margin-top:-10px;">* 날짜를 누르면 해당 일의 상세 기록이 보입니다.</p>
+                <div class="card-title">4월 상세 기록 (날짜 클릭) 📅</div>
                 <div class="grid-container" id="mini-grid"></div>
             </div>
         </div>
     </div>
 
     <div id="section-admin" style="display:none;">
-        <div class="card">
-            <div class="card-title">전체 멤버 현황판</div>
+        <div class="card" style="padding:10px;">
+            <div class="card-title">전체 멤버 수정 보드</div>
             <div class="admin-table-wrapper">
                 <table id="admin-table"></table>
             </div>
@@ -86,11 +81,11 @@
     </div>
 </div>
 
-<div id="modal" onclick="closeModal()">
-    <div class="modal-body" onclick="event.stopPropagation()">
-        <h3 id="modal-date" style="margin-top:0;"></h3>
-        <div id="modal-content"></div>
-        <button onclick="closeModal()" style="width:100%; padding:15px; background:#222; color:#fff; border:none; border-radius:10px; margin-top:20px; font-weight:bold;">닫기</button>
+<div id="modal">
+    <div class="modal-body">
+        <h2 id="modal-date" style="margin-top:0; border-bottom:2px solid #eee; padding-bottom:10px;"></h2>
+        <div id="modal-content" style="margin:20px 0;"></div>
+        <button onclick="closeModal()" style="width:100%; padding:15px; background:var(--main); color:#fff; border:none; border-radius:12px; font-weight:900; font-size:18px;">닫기</button>
     </div>
 </div>
 
@@ -124,7 +119,7 @@
         "bgmsunny": { items: ["기상시간 5:30", "명상", "스트레칭"], note: "평일 실천" }
     };
 
-    let data = [];
+    let db = [];
     const today = new Date().toISOString().split('T')[0];
 
     google.charts.load('current', {packages:['corechart']});
@@ -140,9 +135,9 @@
         q.send(res => {
             if (res.isError()) return;
             const t = res.getDataTable();
-            data = [];
+            db = [];
             for (let i = 0; i < t.getNumberOfRows(); i++) {
-                data.push({ date: t.getFormattedValue(i,0), name: t.getValue(i,1), routine: t.getValue(i,2), status: t.getValue(i,3) });
+                db.push({ date: t.getFormattedValue(i,0), name: t.getValue(i,1), routine: t.getValue(i,2), status: t.getValue(i,3) });
             }
             if(document.getElementById('userSelect').value) loadUser();
             renderAdmin();
@@ -159,25 +154,28 @@
         document.getElementById('topTimer').innerText = `⏱ 마감까지 [ ${h}:${m}:${s} ]`;
     }
 
-    async function setVal(name, routine, status, targetDate = today) {
-        data = data.filter(d => !(d.date.includes(targetDate) && d.name === name && d.routine === routine));
-        if(status !== '대기') data.push({ date: targetDate, name, routine, status });
+    async function updateData(name, routine, status, targetDate) {
+        db = db.filter(d => !(d.date.includes(targetDate) && d.name === name && d.routine === routine));
+        if(status !== '대기') db.push({ date: targetDate, name, routine, status });
         
         loadUser();
         renderAdmin();
         showToast("저장 중...");
-        fetch(API, { method: 'POST', body: JSON.stringify({ date: targetDate, name, routine, status }) })
-        .then(() => showToast("저장 완료!"));
+        
+        try {
+            await fetch(API, { method: 'POST', body: JSON.stringify({ date: targetDate, name, routine, status }) });
+            showToast("성공!");
+        } catch(e) { showToast("실패!"); }
     }
 
     function showToast(m) {
         const t = document.getElementById('toast');
         t.innerText = m; t.style.display = 'block';
-        setTimeout(() => t.style.display = 'none', 1500);
+        setTimeout(() => t.style.display = 'none', 1000);
     }
 
     function getS(n, d, r) {
-        const found = data.filter(x => x.name == n && x.routine == r && x.date.includes(d));
+        const found = db.filter(x => x.name == n && x.routine == r && x.date.includes(d));
         return found.length > 0 ? found[found.length - 1].status : '대기';
     }
 
@@ -195,9 +193,9 @@
                 <div class="item">
                     <div class="item-name">${r}</div>
                     <div class="btn-group">
-                        <button class="btn O ${s==='O'?'active':''}" onclick="setVal('${name}','${r}','O')">O</button>
-                        <button class="btn X ${s==='X'?'active':''}" onclick="setVal('${name}','${r}','X')">X</button>
-                        <button class="btn P ${s==='-'?'active':''}" onclick="setVal('${name}','${r}','-')">-</button>
+                        <button class="btn O ${s==='O'?'active':''}" onclick="updateData('${name}','${r}','O','${today}')">O</button>
+                        <button class="btn X ${s==='X'?'active':''}" onclick="updateData('${name}','${r}','X','${today}')">X</button>
+                        <button class="btn P ${s==='-'?'active':''}" onclick="updateData('${name}','${r}','-','${today}')">-</button>
                     </div>
                 </div>`;
         });
@@ -208,38 +206,37 @@
         const grid = document.getElementById('mini-grid');
         grid.innerHTML = "";
         let oCount = 0, pCount = 0;
-        const currentDay = new Date().getDate();
+        const curDay = new Date().getDate();
 
         for(let i=1; i<=30; i++) {
             const dStr = `2026-04-${String(i).padStart(2,'0')}`;
-            let dayO = 0, dayP = 0;
+            let dO = 0, dP = 0;
             MEMBERS[name].items.forEach(r => {
                 const s = getS(name, dStr, r);
-                if(s === 'O') dayO++; if(s === '-') dayP++;
+                if(s === 'O') dO++; if(s === '-') dP++;
             });
+            if(i <= curDay) { oCount += dO; pCount += dP; }
 
-            if(i <= currentDay) { oCount += dayO; pCount += dayP; }
-
-            const color = dayO === MEMBERS[name].items.length ? '#28C76F' : (dayO > 0 ? '#F1C40F' : '#eee');
+            const color = dO === MEMBERS[name].items.length ? '#28C76F' : (dO > 0 ? '#F1C40F' : '#fff');
             grid.innerHTML += `
-                <div class="day-cell" style="background:${color}" onclick="showDetail('${name}','${dStr}')">
+                <div class="day-cell" style="background:${color}" onclick="openModal('${name}','${dStr}')">
                     <span class="day-num">${i}</span>
-                    <div class="status-dot" style="background:${dayO>0?'#fff':'#ccc'}"></div>
+                    <div class="status-dot" style="background:${dO>0?'#fff':'#ccc'}"></div>
                 </div>`;
         }
-        const total = (currentDay * MEMBERS[name].items.length) - pCount;
-        const rate = total > 0 ? Math.round((oCount/total)*100) : 0;
-        document.getElementById('display-rate').innerText = `성취율: ${rate}%`;
+        const total = (curDay * MEMBERS[name].items.length) - pCount;
+        document.getElementById('display-rate').innerText = `성취율: ${total > 0 ? Math.round((oCount/total)*100) : 0}%`;
     }
 
-    function showDetail(name, date) {
-        document.getElementById('modal-date').innerText = `${date} 상세 기록`;
-        let html = '<div style="font-size:18px;">';
+    function openModal(name, date) {
+        document.getElementById('modal-date').innerText = `${date} 기록`;
+        let html = '';
         MEMBERS[name].items.forEach(r => {
             const s = getS(name, date, r);
-            html += `<div style="padding:10px 0; border-bottom:1px solid #eee;"><b>${r}:</b> <span style="color:${s==='O'?'green':(s==='X'?'red':'gray')}">${s}</span></div>`;
+            html += `<div style="padding:15px 0; border-bottom:1px solid #f0f0f0; font-size:18px; font-weight:800;">
+                        ${r} : <span style="color:${s==='O'?'#28C76F':(s==='X'?'#EA5455':'#888')}">${s}</span>
+                     </div>`;
         });
-        html += '</div>';
         document.getElementById('modal-content').innerHTML = html;
         document.getElementById('modal').style.display = 'flex';
     }
@@ -248,7 +245,7 @@
 
     function renderAdmin() {
         const table = document.getElementById('admin-table');
-        let html = '<thead><tr><th class="sticky-col">멤버</th><th>루틴</th>';
+        let html = '<thead><tr><th class="sticky-col">멤버</th><th>항목</th>';
         for(let i=1; i<=30; i++) html += `<th>${i}</th>`;
         html += '</tr></thead><tbody>';
 
@@ -260,23 +257,22 @@
                 for(let i=1; i<=30; i++) {
                     const dStr = `2026-04-${String(i).padStart(2,'0')}`;
                     const s = getS(name, dStr, r);
-                    html += `<td onclick="setVal('${name}','${r}','${s==='O'?'X':(s==='X'?'-':(s==='-'?'대기':'O'))}','${dStr}')" style="color:${s==='O'?'green':(s==='X'?'red':'gray')}">${s==='대기'?'':s}</td>`;
+                    const next = s==='O'?'X':(s==='X'?'-':(s==='-'?'대기':'O'));
+                    html += `<td onclick="updateData('${name}','${r}','${next}','${dStr}')" style="cursor:pointer; color:${s==='O'?'#28C76F':(s==='X'?'#EA5455':'#888')}">${s==='대기'?'':s}</td>`;
                 }
                 html += `</tr>`;
             });
         });
-        table.innerHTML = html + '</tbody>';
+        table.innerHTML = html;
     }
 
     function showTab(m) {
         if(m === 'admin') {
-            const pw = prompt("관리자 비밀번호를 입력하세요.");
-            if(pw !== "4120") return;
+            if(prompt("관리자 비밀번호") !== "4120") return;
         }
         document.getElementById('section-member').style.display = m==='member'?'block':'none';
         document.getElementById('section-admin').style.display = m==='admin'?'block':'none';
-        document.getElementById('tab-member').classList.toggle('active', m==='member');
-        document.getElementById('tab-admin').classList.toggle('active', m==='admin');
+        document.querySelectorAll('.nav-item').forEach((t, i) => t.classList.toggle('active', (m==='member'&&i===0)||(m==='admin'&&i===1)));
     }
 </script>
 </body>
