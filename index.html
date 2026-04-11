@@ -120,9 +120,15 @@
     };
 
     let db = [];
-    const now = new Date();
-    const todayStr = now.toISOString().split('T')[0];
-    const curD = now.getDate(); 
+    
+    // 한국 시간 기준으로 날짜 가져오기 (고정)
+    function getKSTDate() {
+        const now = new Date();
+        const kst = new Date(now.getTime() + (9 * 60 * 60 * 1000)); // UTC+9
+        const offset = now.getTimezoneOffset() * 60000;
+        const local = new Date(now.getTime() - offset);
+        return local.toISOString().split('T')[0];
+    }
 
     google.charts.load('current', {packages:['corechart']});
     google.charts.setOnLoadCallback(() => {
@@ -156,7 +162,7 @@
         document.getElementById('topTimer').innerText = `⏱ 오늘의 기록 마감까지 [ ${h}:${m}:${s} ] 남았습니다`;
     }
 
-    async function save(name, routine, status, date = todayStr) {
+    async function save(name, routine, status, date = getKSTDate()) {
         db = db.filter(x => !(x.date.includes(date) && x.name === name && x.routine === routine));
         if(status !== '대기') db.push({ date, name, routine, status });
         loadUser();
@@ -179,10 +185,14 @@
     function loadUser() {
         const name = document.getElementById('userSelect').value;
         if(!name) return;
+        const todayStr = getKSTDate();
+        const todayYo = YOS[new Date().getDay()];
+
         document.getElementById('userArea').style.display = 'block';
         document.getElementById('span-name').innerText = name;
         document.getElementById('div-rule').innerText = MEMBERS[name].note || "📍 설정된 개인 수칙이 없습니다.";
-        document.getElementById('today-label').innerText = `오늘(${todayStr} / ${YOS[now.getDay()]}요일)의 체크`;
+        document.getElementById('today-label').innerText = `오늘(${todayStr} / ${todayYo}요일)의 체크`;
+        
         const list = document.getElementById('routine-list');
         list.innerHTML = "";
         MEMBERS[name].items.forEach(r => {
@@ -192,13 +202,12 @@
         renderGrid(name);
     }
 
-    // ⭐ 성취율 계산 로직이 보완된 핵심 함수
     function renderGrid(name) {
         const grid = document.getElementById('mini-grid');
         grid.innerHTML = "";
+        const curD = new Date().getDate();
         let oC = 0, pC = 0, activeItemsCount = 0; 
         const items = MEMBERS[name].items;
-        const itemCount = items.length;
 
         for(let i=1; i<=30; i++) {
             const dS = `2026-04-${String(i).padStart(2,'0')}`;
@@ -208,23 +217,20 @@
             let dO = 0;
             items.forEach(r => {
                 const s = getS(name, dS, r);
-                // 1. 오늘까지만 계산에 포함
                 if(i <= curD) {
-                    // 2. 비어있는(대기) 상태는 분모에서 아예 제외 (이게 핵심!)
                     if(s !== '대기') {
                         if(s === 'O') oC++;
                         if(s === '-') pC++;
-                        activeItemsCount++; // 입력값이 있는 전체 루틴 개수
+                        activeItemsCount++;
                     }
                 }
                 if(s === 'O') dO++;
             });
 
-            const color = dO === itemCount ? '#28C76F' : (dO > 0 ? '#F1C40F' : '#fff');
+            const color = dO === items.length ? '#28C76F' : (dO > 0 ? '#F1C40F' : '#fff');
             grid.innerHTML += `<div class="day-cell" style="background:${color}" onclick="openModal('${name}','${dS}')"><div class="day-num">${i}일</div><div class="day-yo" style="color:${yoColor}">(${YOS[yoNum]})</div></div>`;
         }
         
-        // 🎯 최종 성취율: (입력된 것 중 성공) / (입력된 전체 - 패스)
         const totalForCalc = activeItemsCount - pC;
         const rate = totalForCalc > 0 ? Math.round((oC / totalForCalc) * 100) : 0;
         document.getElementById('rate-summary').innerHTML = `🎯 현재까지 실천 성취율: <b style="font-size:20px;">${rate}%</b> (패스 ${pC}회 제외)`;
@@ -246,6 +252,7 @@
 
     function renderAdmin() {
         const table = document.getElementById('admin-table');
+        const curD = new Date().getDate();
         let h = '<thead><tr><th class="sticky-name" rowspan="2">성함 (수칙)</th><th rowspan="2">루틴 항목</th>';
         for(let i=1; i<=30; i++) h += `<th>${i}</th>`;
         h += `<th rowspan="2">성취율<br><small>(입력기준)</small></th></tr><tr>`;
