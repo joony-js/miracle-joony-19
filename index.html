@@ -72,6 +72,7 @@
     <div id="adminSection" style="display:none;">
         <div class="admin-area">
             <h2 style="text-align:center; color:var(--point);">📊 4월 실시간 통합 현황</h2>
+            <p style="text-align:center; font-size:0.9em; color:#666;">* 표의 칸을 클릭하면 O → X → - 순서로 즉시 변경됩니다.</p>
             <table id="adminTable" class="main-table"></table>
         </div>
     </div>
@@ -167,7 +168,14 @@
         document.getElementById('loading').style.display = 'flex';
         try { 
             await fetch(SHEET_API_URL, { method: 'POST', body: JSON.stringify(payload) }); 
-            setTimeout(fetchRemoteData, 1500); // 전송 후 다시 읽어오기
+            // 전송 성공 후 로컬 DB 업데이트하고 즉시 다시 그리기
+            db = db.filter(d => !(d.date.includes(payload.date) && d.name === payload.name && d.routine === payload.routine));
+            if (payload.status !== '대기') db.push(payload);
+            renderAdminTable();
+            if(document.getElementById('memberSelect').value) loadMemberView();
+            
+            // 시트 데이터 안정화를 위해 잠시 후 한 번 더 갱신
+            setTimeout(fetchRemoteData, 2000);
         } catch (e) { alert("연동 실패"); document.getElementById('loading').style.display = 'none'; }
     }
 
@@ -188,7 +196,6 @@
     }
 
     function getStatus(name, date, routine) {
-        // 날짜 형식을 맞춰서 비교 (YYYY-MM-DD)
         const found = db.filter(d => d.name == name && d.routine == routine && d.date.includes(date));
         return found.length > 0 ? found[found.length - 1].status : '대기';
     }
@@ -253,7 +260,7 @@
                     const dStr = `2026-04-${String(d).padStart(2, '0')}`;
                     const s = getStatus(name, dStr, r);
                     if(d <= currentDay) { if(s==='O') { rO++; memberO++; } if(s==='-') { rP++; memberP++; } }
-                    html += `<td style="font-weight:bold;">${s==='O'?'O':(s==='X'?'X':(s==='-'?'-':''))}</td>`;
+                    html += `<td onclick="adminQuickEdit('${name}','${r}','${dStr}')" style="cursor:pointer; font-weight:bold;">${s==='O'?'O':(s==='X'?'X':(s==='-'?'-':''))}</td>`;
                 }
                 html += `<td class="rate-col">${Math.round((rO / (currentDay - rP)) * 100) || 0}%</td></tr>`;
             });
@@ -263,6 +270,12 @@
             html += `<td class="rate-col" style="background:var(--primary);">${totalRate}%</td></tr>`;
         });
         table.innerHTML = html + `</tbody>`;
+    }
+
+    async function adminQuickEdit(name, routine, date) {
+        const cur = getStatus(name, date, routine);
+        const next = cur === 'O' ? 'X' : (cur === 'X' ? '-' : (cur === '-' ? '대기' : 'O'));
+        await updateStatus(name, routine, next, date);
     }
 
     init();
