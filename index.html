@@ -8,20 +8,16 @@
         :root { --main: #FF9F43; --ok: #28C76F; --no: #EA5455; --etc: #82868B; --bg: #FFF9F2; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Apple SD Gothic Neo', sans-serif; background: var(--bg); margin: 0; color: #333; line-height: 1.5; }
-        
         .header { background: #343A40; color: #F1C40F; padding: 15px; text-align: center; font-weight: 900; font-size: 16px; position: sticky; top: 0; z-index: 1000; }
         .nav { display: flex; gap: 10px; padding: 10px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .nav-item { flex: 1; padding: 12px; text-align: center; font-weight: 800; border-radius: 10px; background: #E9ECEF; color: #495057; cursor: pointer; font-size: 15px; border: none; }
         .nav-item.active { background: var(--main); color: #fff; box-shadow: 0 4px 10px rgba(255,159,67,0.3); }
-
         .content { padding: 15px; padding-bottom: 50px; }
         .select-box { width: 100%; padding: 15px; font-size: 16px; font-weight: 800; border: 2px solid var(--main); border-radius: 12px; margin-bottom: 15px; background: #fff; }
-
         .card { background: #fff; border-radius: 15px; padding: 20px; margin-bottom: 15px; border: 1px solid #FFE0B2; }
         .welcome-text { font-size: 22px; font-weight: 900; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
         .rule-badge { background: #FFF3E0; color: #E65100; padding: 5px 12px; border-radius: 20px; font-size: 14px; font-weight: 700; border: 1px solid #FFCC80; display: inline-block; margin-bottom: 15px; }
         .today-label { font-size: 15px; font-weight: 800; color: #555; margin-bottom: 15px; }
-
         .item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f9f9f9; }
         .item-name { font-size: 16px; font-weight: 700; flex: 1; }
         .btn-group { display: flex; gap: 5px; }
@@ -29,30 +25,19 @@
         .btn.O.active { background: var(--ok); color: #fff; border-color: var(--ok); }
         .btn.X.active { background: var(--no); color: #fff; border-color: var(--no); }
         .btn.P.active { background: var(--etc); color: #fff; border-color: var(--etc); }
-
         .rate-summary { font-size: 16px; font-weight: 800; color: #E67E22; margin: 15px 0; display: flex; align-items: center; gap: 5px; }
         .grid-container { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
         .day-cell { aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; border: 1px solid #eee; background: #fff; cursor: pointer; }
-        
-        /* 멤버 상세표 요일 가독성 강화 */
         .day-yo { font-size: 11px; color: #333; font-weight: 900; margin-top: 3px; }
-
-        /* 관리자 테이블 개선: 날짜와 요일 모두 상단 고정 */
         .admin-wrapper { overflow: auto; max-height: 70vh; border: 1px solid var(--main); border-radius: 10px; background: #fff; position: relative; }
         table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 11px; min-width: 1200px; }
         th, td { border: 1px solid #FFE0B2; padding: 8px 3px; text-align: center; }
-        
-        /* 헤더(날짜+요일) 전체 고정 */
         thead tr th { position: sticky; background: #FFF8E1; color: #E67E22; font-weight: 900; z-index: 10; }
-        thead tr:nth-child(1) th { top: 0; border-bottom: none; } /* 첫 번째 행(날짜) */
-        thead tr:nth-child(2) th { top: 31px; border-bottom: 2px solid var(--main); } /* 두 번째 행(요일) - 날짜 높이만큼 띄움 */
-        
+        thead tr:nth-child(1) th { top: 0; }
+        thead tr:nth-child(2) th { top: 31px; border-bottom: 2px solid var(--main); }
         .sticky-name { position: sticky; left: 0; background: #FFFDE7 !important; z-index: 20; font-weight: 900; border-right: 2px solid var(--main); }
-        thead th.sticky-name { z-index: 30; }
-
         .rate-col { background: #F1F8E9; color: #2E7D32; font-weight: 800; }
         .total-row { background: #FFF9C4; font-weight: 900; }
-
         #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; }
         .modal-body { background: #fff; width: 85%; border-radius: 20px; padding: 25px; max-width: 400px; }
         #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; z-index: 3000; }
@@ -64,7 +49,7 @@
 <div class="header" id="topTimer">오늘의 기록 마감까지 [ 00:00:00 ] 남았습니다</div>
 <div class="nav">
     <button class="nav-item active" id="btn-mem" onclick="showTab('member')">🙋‍♂️ 멤버 인증 및 나의 기록</button>
-    <button class="nav-item" id="btn-adm" onclick="showTab('admin')">👑 관리자 대시보드 (비공개)</button>
+    <button class="nav-item" id="btn-adm" onclick="showTab('admin')">👑 관리자 대시보드</button>
 </div>
 
 <div class="content">
@@ -90,7 +75,6 @@
     <div id="sec-admin" style="display:none;">
         <div class="card" style="padding:10px;">
             <div style="text-align:center; font-size:20px; font-weight:900; color:var(--main); margin-bottom:15px;">📊 4월 실시간 통합 현황</div>
-            <p style="text-align:center; font-size:12px; color:#888; margin-top:-10px;">* 스크롤 시 날짜와 요일 행이 상단에 고정됩니다.</p>
             <div class="admin-wrapper">
                 <table id="admin-table"></table>
             </div>
@@ -138,6 +122,7 @@
     let db = [];
     const now = new Date();
     const todayStr = now.toISOString().split('T')[0];
+    const curD = now.getDate(); // 현재 날짜 (예: 11일)
 
     google.charts.load('current', {packages:['corechart']});
     google.charts.setOnLoadCallback(() => {
@@ -174,7 +159,6 @@
     async function save(name, routine, status, date = todayStr) {
         db = db.filter(x => !(x.date.includes(date) && x.name === name && x.routine === routine));
         if(status !== '대기') db.push({ date, name, routine, status });
-        
         loadUser();
         renderAdmin();
         toast("데이터를 전송 중...");
@@ -199,20 +183,11 @@
         document.getElementById('span-name').innerText = name;
         document.getElementById('div-rule').innerText = MEMBERS[name].note || "📍 설정된 개인 수칙이 없습니다.";
         document.getElementById('today-label').innerText = `오늘(${todayStr} / ${YOS[now.getDay()]}요일)의 체크`;
-
         const list = document.getElementById('routine-list');
         list.innerHTML = "";
         MEMBERS[name].items.forEach(r => {
             const s = getS(name, todayStr, r);
-            list.innerHTML += `
-                <div class="item">
-                    <div class="item-name">${r}</div>
-                    <div class="btn-group">
-                        <button class="btn O ${s==='O'?'active':''}" onclick="save('${name}','${r}','O')">O</button>
-                        <button class="btn X ${s==='X'?'active':''}" onclick="save('${name}','${r}','X')">X</button>
-                        <button class="btn P ${s==='-'?'active':''}" onclick="save('${name}','${r}','-')">-</button>
-                    </div>
-                </div>`;
+            list.innerHTML += `<div class="item"><div class="item-name">${r}</div><div class="btn-group"><button class="btn O ${s==='O'?'active':''}" onclick="save('${name}','${r}','O')">O</button><button class="btn X ${s==='X'?'active':''}" onclick="save('${name}','${r}','X')">X</button><button class="btn P ${s==='-'?'active':''}" onclick="save('${name}','${r}','-')">-</button></div></div>`;
         });
         renderGrid(name);
     }
@@ -221,29 +196,20 @@
         const grid = document.getElementById('mini-grid');
         grid.innerHTML = "";
         let oC = 0, pC = 0;
-        const curD = now.getDate();
-
         for(let i=1; i<=30; i++) {
             const dS = `2026-04-${String(i).padStart(2,'0')}`;
             const yoNum = new Date(2026, 3, i).getDay();
-            const yo = YOS[yoNum];
-            
             const yoColor = (yoNum === 6) ? 'blue' : (yoNum === 0 ? 'red' : '#333');
-            
-            let dO = 0, dP = 0;
+            let dO = 0;
             MEMBERS[name].items.forEach(r => {
                 const s = getS(name, dS, r);
-                if(s === 'O') dO++; if(s === '-') dP++;
+                if(i <= curD) { if(s === 'O') oC++; if(s === '-') pC++; }
+                if(s === 'O') dO++;
             });
-            if(i <= curD) { oC += dO; pC += dP; }
-
             const color = dO === MEMBERS[name].items.length ? '#28C76F' : (dO > 0 ? '#F1C40F' : '#fff');
-            grid.innerHTML += `
-                <div class="day-cell" style="background:${color}" onclick="openModal('${name}','${dS}')">
-                    <div class="day-num">${i}일</div>
-                    <div class="day-yo" style="color:${yoColor}">(${yo})</div>
-                </div>`;
+            grid.innerHTML += `<div class="day-cell" style="background:${color}" onclick="openModal('${name}','${dS}')"><div class="day-num">${i}일</div><div class="day-yo" style="color:${yoColor}">(${YOS[yoNum]})</div></div>`;
         }
+        // 멤버 화면 성취율 계산 수정: 오늘까지의 날짜 기준
         const total = (curD * MEMBERS[name].items.length) - pC;
         const rate = total > 0 ? Math.round((oC/total)*100) : 0;
         document.getElementById('rate-summary').innerHTML = `🎯 오늘까지 실천 성취율: <b style="font-size:20px;">${rate}%</b> (패스 ${pC}회 제외)`;
@@ -265,14 +231,13 @@
 
     function renderAdmin() {
         const table = document.getElementById('admin-table');
-        const curD = now.getDate(); // 성취율 기준을 오늘 날짜로 설정
         let h = '<thead><tr><th class="sticky-name" rowspan="2">성함 (수칙)</th><th rowspan="2">루틴 항목</th>';
         for(let i=1; i<=30; i++) h += `<th>${i}</th>`;
         h += `<th rowspan="2">성취율<br><small>(오늘까지)</small></th></tr><tr>`;
         for(let i=1; i<=30; i++) {
-            const yo = YOS[new Date(2026, 3, i).getDay()];
-            const color = (yo==='토')?'blue':((yo==='일')?'red':'inherit');
-            h += `<th style="color:${color}; font-size:9px;">(${yo})</th>`;
+            const yoNum = new Date(2026, 3, i).getDay();
+            const color = (yoNum===6)?'blue':((yoNum===0)?'red':'inherit');
+            h += `<th style="color:${color}; font-size:9px;">(${YOS[yoNum]})</th>`;
         }
         h += '</tr></thead><tbody>';
 
@@ -287,25 +252,18 @@
                 for(let i=1; i<=30; i++) {
                     const dS = `2026-04-${String(i).padStart(2,'0')}`;
                     const s = getS(name, dS, r);
-                    
-                    // 성취율 계산: 오늘 날짜(curD)까지만 집계
-                    if(i <= curD) {
-                        if(s==='O') { rO++; userO++; } 
-                        if(s==='-') { rP++; userP++; }
-                    }
-                    
+                    if(i <= curD) { if(s==='O') rO++; if(s==='-') rP++; }
                     const nS = s==='O'?'X':(s==='X'?'-':(s==='-'?'대기':'O'));
                     const displayS = (s==='-') ? '패스' : (s==='대기'?'':s);
                     h += `<td onclick="save('${name}','${r}','${nS}','${dS}')" style="cursor:pointer; font-weight:bold; color:${s==='O'?'#28C76F':(s==='X'?'#EA5455':'#888')}">${displayS}</td>`;
                 }
-                // 항목별 성취율: (실천수 / (오늘까지 일수 - 패스수))
-                const rDenominator = curD - rP;
-                const rRate = rDenominator > 0 ? Math.round((rO / rDenominator) * 100) : 0;
+                userO += rO; userP += rP;
+                const rDenom = curD - rP;
+                const rRate = rDenom > 0 ? Math.round((rO / rDenom) * 100) : 0;
                 h += `<td class="rate-col">${rRate}%</td></tr>`;
             });
-            // 전체 성취율: (총실천수 / (항목수 * 오늘까지 일수 - 총패스수))
-            const totalDenominator = (items.length * curD) - userP;
-            const totalRate = totalDenominator > 0 ? Math.round((userO / totalDenominator) * 100) : 0;
+            const totalDenom = (items.length * curD) - userP;
+            const totalRate = totalDenom > 0 ? Math.round((userO / totalDenom) * 100) : 0;
             h += `<tr class="total-row"><td><b>[종합 성취율]</b></td><td colspan="30"></td><td style="background:#FFD600; color:#000;">${totalRate}%</td></tr>`;
         });
         table.innerHTML = h + '</tbody>';
