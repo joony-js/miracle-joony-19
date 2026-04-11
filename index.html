@@ -122,7 +122,7 @@
     let db = [];
     const now = new Date();
     const todayStr = now.toISOString().split('T')[0];
-    const curD = now.getDate(); // 현재 날짜 (예: 11일)
+    const curD = now.getDate(); // 현재 날짜 (오늘 기준 성취율 계산의 핵심)
 
     google.charts.load('current', {packages:['corechart']});
     google.charts.setOnLoadCallback(() => {
@@ -196,22 +196,31 @@
         const grid = document.getElementById('mini-grid');
         grid.innerHTML = "";
         let oC = 0, pC = 0;
+        const itemCount = MEMBERS[name].items.length;
+
         for(let i=1; i<=30; i++) {
             const dS = `2026-04-${String(i).padStart(2,'0')}`;
             const yoNum = new Date(2026, 3, i).getDay();
             const yoColor = (yoNum === 6) ? 'blue' : (yoNum === 0 ? 'red' : '#333');
+            
             let dO = 0;
             MEMBERS[name].items.forEach(r => {
                 const s = getS(name, dS, r);
-                if(i <= curD) { if(s === 'O') oC++; if(s === '-') pC++; }
+                // 오늘(curD) 날짜까지만 성취율 통계에 합산 (매우 중요)
+                if(i <= curD) {
+                    if(s === 'O') oC++;
+                    if(s === '-') pC++;
+                }
                 if(s === 'O') dO++;
             });
-            const color = dO === MEMBERS[name].items.length ? '#28C76F' : (dO > 0 ? '#F1C40F' : '#fff');
+
+            const color = dO === itemCount ? '#28C76F' : (dO > 0 ? '#F1C40F' : '#fff');
             grid.innerHTML += `<div class="day-cell" style="background:${color}" onclick="openModal('${name}','${dS}')"><div class="day-num">${i}일</div><div class="day-yo" style="color:${yoColor}">(${YOS[yoNum]})</div></div>`;
         }
-        // 멤버 화면 성취율 계산 수정: 오늘까지의 날짜 기준
-        const total = (curD * MEMBERS[name].items.length) - pC;
-        const rate = total > 0 ? Math.round((oC/total)*100) : 0;
+        
+        // 🎯 성취율 최종 계산식: 분모를 '오늘 날짜까지'로 강제 제한
+        const totalPossible = (curD * itemCount) - pC;
+        const rate = totalPossible > 0 ? Math.round((oC / totalPossible) * 100) : 0;
         document.getElementById('rate-summary').innerHTML = `🎯 오늘까지 실천 성취율: <b style="font-size:20px;">${rate}%</b> (패스 ${pC}회 제외)`;
     }
 
