@@ -1,5 +1,3 @@
-[index.html](https://github.com/user-attachments/files/26643678/index.html)
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -37,6 +35,7 @@
         .total-row { background: #FFF9E6; font-weight: 900; }
         #loading { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:1000; justify-content:center; align-items:center; font-weight:bold; }
     </style>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 <body>
 
@@ -79,7 +78,10 @@
 </div>
 
 <script>
+    google.charts.load('current', {packages:['corechart', 'table']});
+
     const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbztiOVY2kTQqbL0mQ2iyhq_sB_ukO4w_jUGMfqCzP47XnFzGB8_Dv09I0ewFth1M3U4CA/exec"; 
+    const SPREADSHEET_ID = "1naH8MKtag1s1n9EUXy2xL0dlxq9DqZCIKpEkne32tuU";
     const ADMIN_PW = "4120"; 
     const DEADLINE_HOUR = 24; 
 
@@ -111,16 +113,12 @@
     const daysInMonth = 30;
     const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
 
-    // 실시간 날짜를 가져오는 함수
     function getNowInfo() {
         const now = new Date();
         const y = now.getFullYear();
         const m = String(now.getMonth() + 1).padStart(2, '0');
         const d = String(now.getDate()).padStart(2, '0');
-        return {
-            todayStr: `${y}-${m}-${d}`,
-            currentDay: now.getDate()
-        };
+        return { todayStr: `${y}-${m}-${d}`, currentDay: now.getDate() };
     }
 
     async function init() {
@@ -128,7 +126,7 @@
         Object.keys(MEMBER_DATA).forEach(name => select.add(new Option(name, name)));
         updateTimer();
         setInterval(updateTimer, 1000);
-        await fetchRemoteData();
+        google.charts.setOnLoadCallback(fetchRemoteData);
     }
 
     function updateTimer() {
@@ -143,26 +141,34 @@
     }
 
     async function fetchRemoteData() {
-        if(SHEET_API_URL === "여기에_URL을_넣으세요") {
-            db = JSON.parse(localStorage.getItem('miracle_offline_db')) || [];
-            renderAdminTable(); return;
-        }
         document.getElementById('loading').style.display = 'flex';
-        try {
-            const response = await fetch(SHEET_API_URL);
-            const rawData = await response.json();
-            db = rawData.slice(1).map(row => ({ date: row[0], name: row[1], routine: row[2], status: row[3] }));
-            renderAdminTable();
-        } catch (e) { console.error("Data Load Error"); }
+        const query = new google.visualization.Query(`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=Sheet1`);
+        query.send(handleQueryResponse);
+    }
+
+    function handleQueryResponse(response) {
         document.getElementById('loading').style.display = 'none';
+        if (response.isError()) { console.error('Error: ' + response.getMessage()); return; }
+        const data = response.getDataTable();
+        db = [];
+        for (let i = 0; i < data.getNumberOfRows(); i++) {
+            db.push({
+                date: data.getFormattedValue(i, 0),
+                name: data.getValue(i, 1),
+                routine: data.getValue(i, 2),
+                status: data.getValue(i, 3)
+            });
+        }
+        renderAdminTable();
+        if(document.getElementById('memberSelect').value) loadMemberView();
     }
 
     async function syncToRemote(payload) {
-        if(SHEET_API_URL === "여기에_URL을_넣으세요") return;
         document.getElementById('loading').style.display = 'flex';
-        try { await fetch(SHEET_API_URL, { method: 'POST', body: JSON.stringify(payload) }); } 
-        catch (e) { alert("연동 실패"); }
-        document.getElementById('loading').style.display = 'none';
+        try { 
+            await fetch(SHEET_API_URL, { method: 'POST', body: JSON.stringify(payload) }); 
+            setTimeout(fetchRemoteData, 1500); // 전송 후 다시 읽어오기
+        } catch (e) { alert("연동 실패"); document.getElementById('loading').style.display = 'none'; }
     }
 
     function switchTab(mode) {
@@ -178,16 +184,12 @@
 
     async function updateStatus(name, routine, status, targetDate = getNowInfo().todayStr) {
         const payload = { date: targetDate, name: name, routine: routine, status: status };
-        db = db.filter(d => !(d.date === targetDate && d.name === name && d.routine === routine));
-        if (status !== '대기') db.push(payload);
-        localStorage.setItem('miracle_offline_db', JSON.stringify(db));
         await syncToRemote(payload);
-        loadMemberView();
-        renderAdminTable();
     }
 
     function getStatus(name, date, routine) {
-        const found = db.filter(d => d.date == date && d.name == name && d.routine == routine);
+        // 날짜 형식을 맞춰서 비교 (YYYY-MM-DD)
+        const found = db.filter(d => d.name == name && d.routine == routine && d.date.includes(date));
         return found.length > 0 ? found[found.length - 1].status : '대기';
     }
 
@@ -251,7 +253,7 @@
                     const dStr = `2026-04-${String(d).padStart(2, '0')}`;
                     const s = getStatus(name, dStr, r);
                     if(d <= currentDay) { if(s==='O') { rO++; memberO++; } if(s==='-') { rP++; memberP++; } }
-                    html += `<td onclick="adminQuickEdit('${name}','${r}','${dStr}')" style="cursor:pointer; font-weight:bold;">${s==='O'?'O':(s==='X'?'X':(s==='-'?'-':''))}</td>`;
+                    html += `<td style="font-weight:bold;">${s==='O'?'O':(s==='X'?'X':(s==='-'?'-':''))}</td>`;
                 }
                 html += `<td class="rate-col">${Math.round((rO / (currentDay - rP)) * 100) || 0}%</td></tr>`;
             });
@@ -263,14 +265,6 @@
         table.innerHTML = html + `</tbody>`;
     }
 
-    async function adminQuickEdit(name, routine, date) {
-        const cur = getStatus(name, date, routine);
-        const next = cur === 'O' ? 'X' : (cur === 'X' ? '-' : (cur === '-' ? '대기' : 'O'));
-        db = db.filter(d => !(d.date === date && d.name === name && d.routine === routine));
-        if (next !== '대기') db.push({ date: date, name: name, routine: routine, status: next });
-        renderAdminTable();
-        await syncToRemote({ date: date, name: name, routine: routine, status: next });
-    }
     init();
 </script>
 </body>
