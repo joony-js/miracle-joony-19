@@ -5,133 +5,145 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>미라클 주니 19기 통합센터</title>
     <style>
-        :root { --main: #D35400; --ok: #28C76F; --no: #EA5455; --etc: #82868B; --black: #000; }
+        :root { --main: #FF9F43; --ok: #28C76F; --no: #EA5455; --etc: #82868B; --bg: #FFF9F2; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Apple SD Gothic Neo', sans-serif; background: #F8F9FA; margin: 0; color: var(--black); line-height: 1.5; }
+        body { font-family: 'Apple SD Gothic Neo', sans-serif; background: var(--bg); margin: 0; color: #333; line-height: 1.5; }
         
-        .header { background: #222; color: #F1C40F; padding: 20px; text-align: center; font-weight: 900; font-size: 18px; position: sticky; top: 0; z-index: 100; }
-        .nav { display: flex; background: #fff; border-bottom: 2px solid #eee; }
-        .nav-item { flex: 1; padding: 15px; text-align: center; font-weight: 800; color: #888; cursor: pointer; font-size: 16px; }
-        .nav-item.active { color: var(--main); border-bottom: 4px solid var(--main); }
+        /* 헤더 & 네비 */
+        .header { background: #343A40; color: #F1C40F; padding: 15px; text-align: center; font-weight: 900; font-size: 16px; position: sticky; top: 0; z-index: 100; }
+        .nav { display: flex; gap: 10px; padding: 10px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .nav-item { flex: 1; padding: 12px; text-align: center; font-weight: 800; border-radius: 10px; background: #E9ECEF; color: #495057; cursor: pointer; font-size: 15px; border: none; }
+        .nav-item.active { background: var(--main); color: #fff; box-shadow: 0 4px 10px rgba(255,159,67,0.3); }
 
-        .content { padding: 15px; padding-bottom: 100px; }
-        .select-box { width: 100%; padding: 15px; font-size: 18px; font-weight: 900; border: 3px solid var(--main); border-radius: 12px; margin-bottom: 20px; background: #fff; }
+        .content { padding: 15px; padding-bottom: 50px; }
+        .select-box { width: 100%; padding: 15px; font-size: 16px; font-weight: 800; border: 2px solid var(--main); border-radius: 12px; margin-bottom: 15px; background: #fff; }
 
-        .card { background: #fff; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
-        .card-title { font-size: 20px; font-weight: 900; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #f9f9f9; padding-bottom: 10px; }
-        
-        .item { display: flex; flex-direction: column; gap: 10px; padding: 15px 0; border-bottom: 1px solid #f5f5f5; }
-        .item-name { font-size: 18px; font-weight: 800; color: #333; }
-        .btn-group { display: flex; gap: 8px; }
-        .btn { flex: 1; height: 55px; border-radius: 10px; border: 1px solid #ddd; font-size: 20px; font-weight: 900; background: #fff; color: #ccc; cursor: pointer; }
+        /* 카드 및 텍스트 복원 */
+        .card { background: #fff; border-radius: 15px; padding: 20px; margin-bottom: 15px; border: 1px solid #FFE0B2; }
+        .welcome-text { font-size: 22px; font-weight: 900; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .rule-badge { background: #FFF3E0; color: #E65100; padding: 5px 12px; border-radius: 20px; font-size: 14px; font-weight: 700; border: 1px solid #FFCC80; display: inline-block; margin-bottom: 15px; }
+        .today-label { font-size: 15px; font-weight: 800; color: #555; margin-bottom: 15px; }
+
+        /* 버튼 그룹 */
+        .item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f9f9f9; }
+        .item-name { font-size: 16px; font-weight: 700; flex: 1; }
+        .btn-group { display: flex; gap: 5px; }
+        .btn { width: 45px; height: 45px; border-radius: 8px; border: 1px solid #eee; font-size: 16px; font-weight: 900; background: #fff; color: #ccc; }
         .btn.O.active { background: var(--ok); color: #fff; border-color: var(--ok); }
         .btn.X.active { background: var(--no); color: #fff; border-color: var(--no); }
         .btn.P.active { background: var(--etc); color: #fff; border-color: var(--etc); }
 
-        .grid-container { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 10px; }
-        .day-cell { aspect-ratio: 1; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; border: 1px solid #eee; cursor: pointer; background: #fff; }
-        .day-num { font-size: 14px; margin-bottom: 2px; }
-        .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #ddd; }
+        /* 성취율 및 그리드 */
+        .rate-summary { font-size: 16px; font-weight: 800; color: #E67E22; margin: 15px 0; display: flex; align-items: center; gap: 5px; }
+        .grid-container { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .day-cell { aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; border: 1px solid #eee; background: #fff; }
+        .day-yo { font-size: 9px; color: #888; margin-top: 2px; }
 
-        .admin-table-wrapper { overflow-x: auto; margin-top: 10px; border-radius: 10px; border: 1px solid #ddd; }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 900px; background: #fff; }
-        th, td { border: 1px solid #ddd; padding: 8px 2px; text-align: center; font-weight: 700; height: 40px; }
-        th { background: #f8f8f8; position: sticky; top: 0; z-index: 10; }
-        .sticky-col { position: sticky; left: 0; background: #fff; z-index: 5; border-right: 2px solid var(--main) !important; width: 60px; }
+        /* 관리자 테이블 (밝은 색상 복원) */
+        .admin-wrapper { overflow-x: auto; border: 1px solid var(--main); border-radius: 10px; background: #fff; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 1000px; }
+        th, td { border: 1px solid #FFE0B2; padding: 8px 3px; text-align: center; }
+        th { background: #FFF8E1; color: #E67E22; font-weight: 900; }
+        .sticky-name { position: sticky; left: 0; background: #FFFDE7; z-index: 5; font-weight: 900; border-right: 2px solid var(--main); }
+        .rate-col { background: #F1F8E9; color: #2E7D32; font-weight: 800; }
+        .total-row { background: #FFF9C4; font-weight: 900; }
 
-        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; }
-        .modal-body { background: #fff; width: 90%; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        
-        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 12px 25px; border-radius: 30px; font-size: 14px; display: none; z-index: 20000; }
+        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-body { background: #fff; width: 85%; border-radius: 20px; padding: 25px; }
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 14px; display: none; z-index: 2000; }
     </style>
     <script src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 <body>
 
-<div class="header" id="topTimer">미라클 주니 19기 통합센터</div>
+<div class="header" id="topTimer">오늘의 기록 마감까지 [ 00:00:00 ] 남았습니다</div>
 <div class="nav">
-    <div class="nav-item active" id="tab-member" onclick="showTab('member')">나의 기록</div>
-    <div class="nav-item" id="tab-admin" onclick="showTab('admin')">관리자 대시보드</div>
+    <button class="nav-item active" id="btn-mem" onclick="showTab('member')">🙋‍♂️ 멤버 인증 및 나의 기록</button>
+    <button class="nav-item" id="btn-adm" onclick="showTab('admin')">👑 관리자 대시보드 (비공개)</button>
 </div>
 
 <div class="content">
-    <div id="section-member">
+    <div id="sec-member">
         <select class="select-box" id="userSelect" onchange="loadUser()">
-            <option value="">이름을 선택하세요</option>
+            <option value="">본인 이름을 선택하세요</option>
         </select>
-        <div id="userDetail" style="display:none;">
+        <div id="userArea" style="display:none;">
             <div class="card">
-                <div class="card-title"><span id="display-name"></span> <span id="display-rate" style="color:var(--main); font-size:16px;"></span></div>
+                <div class="welcome-text">👋 반갑습니다, <span id="span-name"></span>님!</div>
+                <div id="div-rule" class="rule-badge"></div>
+                <div class="today-label" id="today-label"></div>
                 <div id="routine-list"></div>
             </div>
             <div class="card">
-                <div class="card-title">4월 상세 기록 (날짜 클릭) 📅</div>
+                <div style="font-size: 18px; font-weight: 900; margin-bottom:10px;">📅 나의 4월 상세 루틴 기록표</div>
+                <div class="rate-summary" id="rate-summary"></div>
                 <div class="grid-container" id="mini-grid"></div>
             </div>
         </div>
     </div>
 
-    <div id="section-admin" style="display:none;">
+    <div id="sec-admin" style="display:none;">
         <div class="card" style="padding:10px;">
-            <div class="card-title">전체 멤버 수정 보드</div>
-            <div class="admin-table-wrapper">
+            <div style="text-align:center; font-size:20px; font-weight:900; color:var(--main); margin-bottom:15px;">📊 4월 실시간 통합 현황</div>
+            <p style="text-align:center; font-size:12px; color:#888; margin-top:-10px;">* 표의 칸을 클릭하면 O → X → - 순서로 즉시 변경됩니다.</p>
+            <div class="admin-wrapper">
                 <table id="admin-table"></table>
             </div>
         </div>
     </div>
 </div>
 
-<div id="modal">
-    <div class="modal-body">
-        <h2 id="modal-date" style="margin-top:0; border-bottom:2px solid #eee; padding-bottom:10px;"></h2>
-        <div id="modal-content" style="margin:20px 0;"></div>
-        <button onclick="closeModal()" style="width:100%; padding:15px; background:var(--main); color:#fff; border:none; border-radius:12px; font-weight:900; font-size:18px;">닫기</button>
+<div id="modal" onclick="closeModal()">
+    <div class="modal-body" onclick="event.stopPropagation()">
+        <h3 id="modal-date"></h3>
+        <div id="modal-content"></div>
+        <button onclick="closeModal()" style="width:100%; padding:15px; background:var(--main); color:#fff; border:none; border-radius:10px; margin-top:20px; font-weight:bold;">닫기</button>
     </div>
 </div>
-
-<div id="toast">저장 중...</div>
+<div id="toast"></div>
 
 <script>
     const API = "https://script.google.com/macros/s/AKfycbztiOVY2kTQqbL0mQ2iyhq_sB_ukO4w_jUGMfqCzP47XnFzGB8_Dv09I0ewFth1M3U4CA/exec";
     const SID = "1naH8MKtag1s1n9EUXy2xL0dlxq9DqZCIKpEkne32tuU";
-    
+    const YOS = ["일","월","화","수","목","금","토"];
     const MEMBERS = {
-        "곰돌": { items: ["기상시간 5시", "필사", "새벽기도(독서)", "글쓰기"], note: "주말 자유" },
-        "글터지기": { items: ["기상시간 5시", "독서", "글쓰기", "산책", "취침 10:30"], note: "일요일 자유" },
-        "날위한 나": { items: ["기상시간 6:30", "필사", "글쓰기", "취침 10:30"], note: "주말 자유" },
-        "낭만다정": { items: ["기상시간 6시", "독서(운동, 글쓰기)"], note: "평일 실천" },
-        "들꽃향기": { items: ["기상시간 6시", "글쓰기", "독서", "스트레칭"], note: "평일 실천" },
-        "보름달": { items: ["기상시간 6시", "독서", "필사"], note: "평일 실천" },
-        "비채꿈": { items: ["기상시간 5:30", "독서", "필사", "경전 읽기", "글쓰기"], note: "평일 실천" },
-        "사랑초": { items: ["기상시간 6시", "독서", "글쓰기", "걷기"], note: "평일 실천" },
-        "써니허니": { items: ["기상시간 6시", "독서", "경제 공부", "스트레칭"], note: "평일 실천" },
-        "앨리스샘": { items: ["기상시간 4시", "걷기", "글쓰기"], note: "평일 실천" },
-        "열정부메랑": { items: ["기상시간 4:30", "운동"], note: "평일 실천" },
+        "곰돌": { items: ["기상시간 5시", "필사", "새벽기도(독서)", "글쓰기"], note: "📍 개인 수칙: 주말 기상 자유" },
+        "글터지기": { items: ["기상시간 5시", "독서", "글쓰기", "산책 (주3회)", "취침 10:30분 이전"], note: "📍 개인 수칙: 일요일 자유" },
+        "날위한 나": { items: ["기상시간 6:30분", "필사", "글쓰기"], note: "📍 개인 수칙: 주말 7:30 기상" },
+        "낭만다정": { items: ["기상시간 6시", "독서(운동, 글쓰기)"], note: "📍 개인 수칙: 평일 실천" },
+        "들꽃향기": { items: ["기상시간 6시", "글쓰기", "독서", "스트레칭"], note: "📍 개인 수칙: 평일 실천" },
+        "보름달": { items: ["기상시간 6시", "독서", "필사"], note: "📍 개인 수칙: 평일 실천" },
+        "비채꿈": { items: ["기상시간 5:30", "독서", "필사", "경전 읽기", "글쓰기"], note: "📍 개인 수칙: 평일 실천" },
+        "사랑초": { items: ["기상시간 6시", "독서", "글쓰기", "걷기"], note: "📍 개인 수칙: 평일 실천" },
+        "써니허니": { items: ["기상시간 6시", "독서", "경제 공부", "스트레칭"], note: "📍 개인 수칙: 평일 실천" },
+        "앨리스샘": { items: ["기상시간 4시", "걷기", "글쓰기"], note: "📍 개인 수칙: 평일 실천" },
+        "열정부메랑": { items: ["기상시간 4:30", "운동"], note: "📍 개인 수칙: 평일 실천" },
         "열정소피아": { items: ["기상시간 4시", "독서", "기도"], note: "" },
-        "오빛다": { items: ["기상시간 4시", "영어 공부", "독서", "필사", "걷기"], note: "평일 실천" },
-        "윤슬": { items: ["기상시간 6:30", "독서", "글쓰기"], note: "주말 7:30" },
-        "즐거운호호씨": { items: ["기상시간 7시", "필사", "말씀"], note: "평일 실천" },
-        "지금사랑": { items: ["기상시간 6시", "독서", "식단조절"], note: "평일 실천" },
+        "오빛다": { items: ["기상시간 4시", "영어 공부", "독서", "필사", "걷기"], note: "📍 개인 수칙: 평일 실천" },
+        "윤슬": { items: ["기상시간 6:30", "독서", "글쓰기"], note: "📍 개인 수칙: 주말 7:30" },
+        "즐거운호호씨": { items: ["기상시간 7시", "필사", "말씀"], note: "📍 개인 수칙: 평일 실천" },
+        "지금사랑": { items: ["기상시간 6시", "독서", "식단조절"], note: "📍 개인 수칙: 평일 실천" },
         "탈렌트수니": { items: ["기상시간 6시", "운동", "독서", "말씀산책"], note: "" },
-        "페이페이": { items: ["기상시간 7시", "글쓰기", "운동"], note: "평일 실천" },
-        "하니오웰": { items: ["기상시간 6시", "독서", "글쓰기", "걷기"], note: "평일 실천" },
+        "페이페이": { items: ["기상시간 7시", "글쓰기", "운동"], note: "📍 개인 수칙: 평일 실천" },
+        "하니오웰": { items: ["기상시간 6시", "독서", "글쓰기", "걷기"], note: "📍 개인 수칙: 평일 실천" },
         "mam 마음": { items: ["기상시간 6시", "글쓰기", "걷기"], note: "" },
-        "bgmsunny": { items: ["기상시간 5:30", "명상", "스트레칭"], note: "평일 실천" }
+        "bgmsunny": { items: ["기상시간 5:30", "명상", "스트레칭"], note: "📍 개인 수칙: 평일 실천" }
     };
 
     let db = [];
-    const today = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
 
     google.charts.load('current', {packages:['corechart']});
     google.charts.setOnLoadCallback(() => {
         const sel = document.getElementById('userSelect');
         Object.keys(MEMBERS).forEach(m => sel.add(new Option(m, m)));
         fetchData();
-        setInterval(updateTimer, 1000);
+        setInterval(tick, 1000);
     });
 
     function fetchData() {
-        const q = new google.visualization.Query(`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&sheet=Sheet1&v=` + Date.now());
+        const q = new google.visualization.Query(`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&sheet=Sheet1&v=${Date.now()}`);
         q.send(res => {
             if (res.isError()) return;
             const t = res.getDataTable();
@@ -144,58 +156,56 @@
         });
     }
 
-    function updateTimer() {
-        const now = new Date();
-        const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 24, 0, 0);
-        const diff = end - now;
-        const h = String(Math.floor(diff/3600000)).padStart(2,'0');
-        const m = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
-        const s = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
-        document.getElementById('topTimer').innerText = `⏱ 마감까지 [ ${h}:${m}:${s} ]`;
+    function tick() {
+        const n = new Date();
+        const e = new Date(n.getFullYear(), n.getMonth(), n.getDate(), 24, 0, 0);
+        const d = e - n;
+        const h = String(Math.floor(d/3600000)).padStart(2,'0');
+        const m = String(Math.floor((d%3600000)/60000)).padStart(2,'0');
+        const s = String(Math.floor((d%60000)/1000)).padStart(2,'0');
+        document.getElementById('topTimer').innerText = `⏱ 오늘의 기록 마감까지 [ ${h}:${m}:${s} ] 남았습니다`;
     }
 
-    async function updateData(name, routine, status, targetDate) {
-        db = db.filter(d => !(d.date.includes(targetDate) && d.name === name && d.routine === routine));
-        if(status !== '대기') db.push({ date: targetDate, name, routine, status });
+    async function save(name, routine, status, date = todayStr) {
+        db = db.filter(x => !(x.date.includes(date) && x.name === name && x.routine === routine));
+        if(status !== '대기') db.push({ date, name, routine, status });
         
         loadUser();
         renderAdmin();
-        showToast("저장 중...");
-        
-        try {
-            await fetch(API, { method: 'POST', body: JSON.stringify({ date: targetDate, name, routine, status }) });
-            showToast("성공!");
-        } catch(e) { showToast("실패!"); }
+        toast("데이터를 안전하게 보내는 중...");
+        fetch(API, { method: 'POST', body: JSON.stringify({ date, name, routine, status }) }).then(() => toast("기록 완료! ✨"));
     }
 
-    function showToast(m) {
+    function toast(m) {
         const t = document.getElementById('toast');
         t.innerText = m; t.style.display = 'block';
-        setTimeout(() => t.style.display = 'none', 1000);
+        setTimeout(() => t.style.display = 'none', 1500);
     }
 
     function getS(n, d, r) {
-        const found = db.filter(x => x.name == n && x.routine == r && x.date.includes(d));
-        return found.length > 0 ? found[found.length - 1].status : '대기';
+        const f = db.filter(x => x.name == n && x.routine == r && x.date.includes(d));
+        return f.length > 0 ? f[f.length-1].status : '대기';
     }
 
     function loadUser() {
         const name = document.getElementById('userSelect').value;
         if(!name) return;
-        document.getElementById('userDetail').style.display = 'block';
-        document.getElementById('display-name').innerText = `👋 ${name}님`;
+        document.getElementById('userArea').style.display = 'block';
+        document.getElementById('span-name').innerText = name;
+        document.getElementById('div-rule').innerText = MEMBERS[name].note;
+        document.getElementById('today-label').innerText = `오늘(${todayStr} / ${YOS[now.getDay()]}요일)의 체크`;
 
         const list = document.getElementById('routine-list');
         list.innerHTML = "";
         MEMBERS[name].items.forEach(r => {
-            const s = getS(name, today, r);
+            const s = getS(name, todayStr, r);
             list.innerHTML += `
                 <div class="item">
                     <div class="item-name">${r}</div>
                     <div class="btn-group">
-                        <button class="btn O ${s==='O'?'active':''}" onclick="updateData('${name}','${r}','O','${today}')">O</button>
-                        <button class="btn X ${s==='X'?'active':''}" onclick="updateData('${name}','${r}','X','${today}')">X</button>
-                        <button class="btn P ${s==='-'?'active':''}" onclick="updateData('${name}','${r}','-','${today}')">-</button>
+                        <button class="btn O ${s==='O'?'active':''}" onclick="save('${name}','${r}','O')">O</button>
+                        <button class="btn X ${s==='X'?'active':''}" onclick="save('${name}','${r}','X')">X</button>
+                        <button class="btn P ${s==='-'?'active':''}" onclick="save('${name}','${r}','-')">-</button>
                     </div>
                 </div>`;
         });
@@ -205,39 +215,39 @@
     function renderGrid(name) {
         const grid = document.getElementById('mini-grid');
         grid.innerHTML = "";
-        let oCount = 0, pCount = 0;
-        const curDay = new Date().getDate();
+        let oC = 0, pC = 0;
+        const curD = now.getDate();
 
         for(let i=1; i<=30; i++) {
-            const dStr = `2026-04-${String(i).padStart(2,'0')}`;
+            const dS = `2026-04-${String(i).padStart(2,'0')}`;
+            const yo = YOS[new Date(2026, 3, i).getDay()];
             let dO = 0, dP = 0;
             MEMBERS[name].items.forEach(r => {
-                const s = getS(name, dStr, r);
+                const s = getS(name, dS, r);
                 if(s === 'O') dO++; if(s === '-') dP++;
             });
-            if(i <= curDay) { oCount += dO; pCount += dP; }
+            if(i <= curD) { oC += dO; pC += dP; }
 
             const color = dO === MEMBERS[name].items.length ? '#28C76F' : (dO > 0 ? '#F1C40F' : '#fff');
             grid.innerHTML += `
-                <div class="day-cell" style="background:${color}" onclick="openModal('${name}','${dStr}')">
-                    <span class="day-num">${i}</span>
-                    <div class="status-dot" style="background:${dO>0?'#fff':'#ccc'}"></div>
+                <div class="day-cell" style="background:${color}" onclick="openModal('${name}','${dS}')">
+                    <div class="day-num">${i}일</div>
+                    <div class="day-yo">(${yo})</div>
                 </div>`;
         }
-        const total = (curDay * MEMBERS[name].items.length) - pCount;
-        document.getElementById('display-rate').innerText = `성취율: ${total > 0 ? Math.round((oCount/total)*100) : 0}%`;
+        const total = (curD * MEMBERS[name].items.length) - pC;
+        const rate = total > 0 ? Math.round((oC/total)*100) : 0;
+        document.getElementById('rate-summary').innerHTML = `🎯 오늘까지 실천 성취율: <b style="font-size:20px;">${rate}%</b> (패스 ${pC}회 제외)`;
     }
 
     function openModal(name, date) {
-        document.getElementById('modal-date').innerText = `${date} 기록`;
-        let html = '';
+        document.getElementById('modal-date').innerText = `${date} 상세 기록`;
+        let h = '<div style="font-size:16px;">';
         MEMBERS[name].items.forEach(r => {
             const s = getS(name, date, r);
-            html += `<div style="padding:15px 0; border-bottom:1px solid #f0f0f0; font-size:18px; font-weight:800;">
-                        ${r} : <span style="color:${s==='O'?'#28C76F':(s==='X'?'#EA5455':'#888')}">${s}</span>
-                     </div>`;
+            h += `<p><b>${r}:</b> <span style="color:${s==='O'?'green':(s==='X'?'red':'gray')}">${s}</span></p>`;
         });
-        document.getElementById('modal-content').innerHTML = html;
+        document.getElementById('modal-content').innerHTML = h + '</div>';
         document.getElementById('modal').style.display = 'flex';
     }
 
@@ -245,34 +255,39 @@
 
     function renderAdmin() {
         const table = document.getElementById('admin-table');
-        let html = '<thead><tr><th class="sticky-col">멤버</th><th>항목</th>';
-        for(let i=1; i<=30; i++) html += `<th>${i}</th>`;
-        html += '</tr></thead><tbody>';
+        let h = '<thead><tr><th class="sticky-name">성함 (수칙)</th><th>루틴 항목</th>';
+        for(let i=1; i<=30; i++) h += `<th>${i}</th>`;
+        h += '<th>성취율</th></tr></thead><tbody>';
 
         Object.keys(MEMBERS).forEach(name => {
+            let userO = 0, userP = 0;
             MEMBERS[name].items.forEach((r, idx) => {
-                html += `<tr>`;
-                if(idx===0) html += `<td class="sticky-col" rowspan="${MEMBERS[name].items.length}">${name}</td>`;
-                html += `<td style="text-align:left;">${r}</td>`;
+                let rO = 0, rP = 0;
+                h += `<tr>`;
+                if(idx===0) h += `<td class="sticky-name" rowspan="${MEMBERS[name].items.length+1}">${name}<br><small style="color:#E67E22;font-weight:normal">${MEMBERS[name].note.replace('📍 개인 수칙: ','')}</small></td>`;
+                h += `<td style="text-align:left; padding-left:10px;">${r}</td>`;
                 for(let i=1; i<=30; i++) {
-                    const dStr = `2026-04-${String(i).padStart(2,'0')}`;
-                    const s = getS(name, dStr, r);
-                    const next = s==='O'?'X':(s==='X'?'-':(s==='-'?'대기':'O'));
-                    html += `<td onclick="updateData('${name}','${r}','${next}','${dStr}')" style="cursor:pointer; color:${s==='O'?'#28C76F':(s==='X'?'#EA5455':'#888')}">${s==='대기'?'':s}</td>`;
+                    const dS = `2026-04-${String(i).padStart(2,'0')}`;
+                    const s = getS(name, dS, r);
+                    if(s==='O') { rO++; userO++; } if(s==='-') { rP++; userP++; }
+                    const nS = s==='O'?'X':(s==='X'?'-':(s==='-'?'대기':'O'));
+                    h += `<td onclick="save('${name}','${r}','${nS}','${dS}')" style="cursor:pointer; color:${s==='O'?'#28C76F':(s==='X'?'#EA5455':'#888')}">${s==='대기'?'':s}</td>`;
                 }
-                html += `</tr>`;
+                const rRate = Math.round((rO / (30-rP)) * 100) || 0;
+                h += `<td class="rate-col">${rRate}%</td></tr>`;
             });
+            const totalRate = Math.round((userO / ((30 * MEMBERS[name].items.length)-userP)) * 100) || 0;
+            h += `<tr class="total-row"><td><b>[종합 성취율]</b></td><td colspan="30"></td><td style="background:#FFD600; color:#000;">${totalRate}%</td></tr>`;
         });
-        table.innerHTML = html;
+        table.innerHTML = h + '</tbody>';
     }
 
     function showTab(m) {
-        if(m === 'admin') {
-            if(prompt("관리자 비밀번호") !== "4120") return;
-        }
-        document.getElementById('section-member').style.display = m==='member'?'block':'none';
-        document.getElementById('section-admin').style.display = m==='admin'?'block':'none';
-        document.querySelectorAll('.nav-item').forEach((t, i) => t.classList.toggle('active', (m==='member'&&i===0)||(m==='admin'&&i===1)));
+        if(m === 'admin') { if(prompt("관리자 비밀번호") !== "4120") return; }
+        document.getElementById('sec-member').style.display = m==='member'?'block':'none';
+        document.getElementById('sec-admin').style.display = m==='admin'?'block':'none';
+        document.getElementById('btn-mem').classList.toggle('active', m==='member');
+        document.getElementById('btn-adm').classList.toggle('active', m==='admin');
     }
 </script>
 </body>
