@@ -228,7 +228,6 @@
             const yoNum = new Date(2026, 3, i).getDay();
             const yo = YOS[yoNum];
             
-            // 토요일(6) 파란색, 일요일(0) 빨간색 적용
             const yoColor = (yoNum === 6) ? 'blue' : (yoNum === 0 ? 'red' : '#333');
             
             let dO = 0, dP = 0;
@@ -266,9 +265,10 @@
 
     function renderAdmin() {
         const table = document.getElementById('admin-table');
+        const curD = now.getDate(); // 성취율 기준을 오늘 날짜로 설정
         let h = '<thead><tr><th class="sticky-name" rowspan="2">성함 (수칙)</th><th rowspan="2">루틴 항목</th>';
         for(let i=1; i<=30; i++) h += `<th>${i}</th>`;
-        h += `<th rowspan="2">성취율</th></tr><tr>`;
+        h += `<th rowspan="2">성취율<br><small>(오늘까지)</small></th></tr><tr>`;
         for(let i=1; i<=30; i++) {
             const yo = YOS[new Date(2026, 3, i).getDay()];
             const color = (yo==='토')?'blue':((yo==='일')?'red':'inherit');
@@ -287,15 +287,25 @@
                 for(let i=1; i<=30; i++) {
                     const dS = `2026-04-${String(i).padStart(2,'0')}`;
                     const s = getS(name, dS, r);
-                    if(s==='O') { rO++; userO++; } if(s==='-') { rP++; userP++; }
+                    
+                    // 성취율 계산: 오늘 날짜(curD)까지만 집계
+                    if(i <= curD) {
+                        if(s==='O') { rO++; userO++; } 
+                        if(s==='-') { rP++; userP++; }
+                    }
+                    
                     const nS = s==='O'?'X':(s==='X'?'-':(s==='-'?'대기':'O'));
                     const displayS = (s==='-') ? '패스' : (s==='대기'?'':s);
                     h += `<td onclick="save('${name}','${r}','${nS}','${dS}')" style="cursor:pointer; font-weight:bold; color:${s==='O'?'#28C76F':(s==='X'?'#EA5455':'#888')}">${displayS}</td>`;
                 }
-                const rRate = Math.round((rO / (30-rP)) * 100) || 0;
+                // 항목별 성취율: (실천수 / (오늘까지 일수 - 패스수))
+                const rDenominator = curD - rP;
+                const rRate = rDenominator > 0 ? Math.round((rO / rDenominator) * 100) : 0;
                 h += `<td class="rate-col">${rRate}%</td></tr>`;
             });
-            const totalRate = Math.round((userO / ((30 * items.length)-userP)) * 100) || 0;
+            // 전체 성취율: (총실천수 / (항목수 * 오늘까지 일수 - 총패스수))
+            const totalDenominator = (items.length * curD) - userP;
+            const totalRate = totalDenominator > 0 ? Math.round((userO / totalDenominator) * 100) : 0;
             h += `<tr class="total-row"><td><b>[종합 성취율]</b></td><td colspan="30"></td><td style="background:#FFD600; color:#000;">${totalRate}%</td></tr>`;
         });
         table.innerHTML = h + '</tbody>';
