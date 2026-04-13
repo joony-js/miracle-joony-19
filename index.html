@@ -78,7 +78,7 @@
         <button class="download-btn" onclick="downloadAdminImage()">📸 현황 이미지로 저장 (멤버 공유용)</button>
         <div class="card" style="padding:10px;" id="admin-capture-area">
             <div style="text-align:center; font-size:20px; font-weight:900; color:var(--main); margin-bottom:15px;">📊 4월 실시간 통합 현황</div>
-            <div class="admin-wrapper">
+            <div class="admin-wrapper" id="admin-wrapper">
                 <table id="admin-table"></table>
             </div>
         </div>
@@ -95,6 +95,7 @@
 <div id="toast"></div>
 
 <script>
+    // ... API, SID, MEMBERS 등 데이터 부분은 기존과 동일하므로 유지 ...
     const API = "https://script.google.com/macros/s/AKfycbztiOVY2kTQqbL0mQ2iyhq_sB_ukO4w_jUGMfqCzP47XnFzGB8_Dv09I0ewFth1M3U4CA/exec";
     const SID = "1naH8MKtag1s1n9EUXy2xL0dlxq9DqZCIKpEkne32tuU";
     const YOS = ["일","월","화","수","목","금","토"];
@@ -123,10 +124,10 @@
     };
 
     let db = [];
-    
+
+    // 공통 로직들 (fetchData, tick, save 등 기존과 동일)
     function getKSTDate() {
         const now = new Date();
-        const kst = new Date(now.getTime() + (9 * 60 * 60 * 1000));
         const offset = now.getTimezoneOffset() * 60000;
         const local = new Date(now.getTime() - offset);
         return local.toISOString().split('T')[0];
@@ -189,12 +190,10 @@
         if(!name) return;
         const todayStr = getKSTDate();
         const todayYo = YOS[new Date().getDay()];
-
         document.getElementById('userArea').style.display = 'block';
         document.getElementById('span-name').innerText = name;
         document.getElementById('div-rule').innerText = MEMBERS[name].note || "📍 설정된 개인 수칙이 없습니다.";
         document.getElementById('today-label').innerText = `오늘(${todayStr} / ${todayYo}요일)의 체크`;
-        
         const list = document.getElementById('routine-list');
         list.innerHTML = "";
         MEMBERS[name].items.forEach(r => {
@@ -210,43 +209,24 @@
         const curD = new Date().getDate();
         let oC = 0, pC = 0, activeItemsCount = 0; 
         const items = MEMBERS[name].items;
-
         for(let i=1; i<=30; i++) {
             const dS = `2026-04-${String(i).padStart(2,'0')}`;
             const yoNum = new Date(2026, 3, i).getDay();
             const yoColor = (yoNum === 6) ? 'blue' : (yoNum === 0 ? 'red' : '#333');
-            
             let dO = 0, dP = 0, dX = 0, dInput = 0;
             items.forEach(r => {
                 const s = getS(name, dS, r);
-                if(i <= curD) {
-                    if(s !== '대기') {
-                        if(s === 'O') oC++;
-                        if(s === '-') pC++;
-                        activeItemsCount++;
-                    }
-                }
-                if(s === 'O') dO++;
-                if(s === '-') dP++;
-                if(s === 'X') dX++;
-                if(s !== '대기') dInput++;
+                if(i <= curD) { if(s !== '대기') { if(s === 'O') oC++; if(s === '-') pC++; activeItemsCount++; } }
+                if(s === 'O') dO++; if(s === '-') dP++; if(s === 'X') dX++; if(s !== '대기') dInput++;
             });
-
-            // 색상 로직 수정: 미입력은 흰색, 모든 루틴 패스 시 #e2e2e2
             let color = '#fff';
             if (dInput > 0) {
-                if (dO === items.length) {
-                    color = '#28C76F'; // 모두 성공 (초록)
-                } else if (dP === items.length) {
-                    color = '#e2e2e2'; // 모두 패스 (회색) - 요청사항
-                } else if (dO > 0 || dX > 0 || dP > 0) {
-                    color = '#F1C40F'; // 일부 실천 (노랑)
-                }
+                if (dO === items.length) color = '#28C76F';
+                else if (dP === items.length) color = '#e2e2e2';
+                else if (dO > 0 || dX > 0 || dP > 0) color = '#F1C40F';
             }
-            
             grid.innerHTML += `<div class="day-cell" style="background:${color}" onclick="openModal('${name}','${dS}')"><div class="day-num">${i}일</div><div class="day-yo" style="color:${yoColor}">(${YOS[yoNum]})</div></div>`;
         }
-        
         const totalForCalc = activeItemsCount - pC;
         const rate = totalForCalc > 0 ? Math.round((oC / totalForCalc) * 100) : 0;
         document.getElementById('rate-summary').innerHTML = `🎯 현재까지 실천 성취율: <b style="font-size:20px;">${rate}%</b> (패스 ${pC}회 제외)`;
@@ -263,7 +243,6 @@
         document.getElementById('modal-content').innerHTML = h + '</div>';
         document.getElementById('modal').style.display = 'flex';
     }
-
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
     function renderAdmin() {
@@ -278,7 +257,6 @@
             h += `<th style="color:${color}; font-size:9px;">(${YOS[yoNum]})</th>`;
         }
         h += '</tr></thead><tbody>';
-
         Object.keys(MEMBERS).forEach(name => {
             let userO = 0, userP = 0, userActive = 0;
             const items = MEMBERS[name].items;
@@ -290,11 +268,7 @@
                 for(let i=1; i<=30; i++) {
                     const dS = `2026-04-${String(i).padStart(2,'0')}`;
                     const s = getS(name, dS, r);
-                    if(i <= curD && s !== '대기') { 
-                        if(s==='O') rO++; 
-                        if(s==='-') rP++; 
-                        rActive++;
-                    }
+                    if(i <= curD && s !== '대기') { if(s==='O') rO++; if(s==='-') rP++; rActive++; }
                     const nS = s==='O'?'X':(s==='X'?'-':(s==='-'?'대기':'O'));
                     const displayS = (s==='-') ? '패스' : (s==='대기'?'':s);
                     h += `<td onclick="save('${name}','${r}','${nS}','${dS}')" style="cursor:pointer; font-weight:bold; color:${s==='O'?'#28C76F':(s==='X'?'#EA5455':'#888')}">${displayS}</td>`;
@@ -319,21 +293,46 @@
         document.getElementById('btn-adm').classList.toggle('active', m==='admin');
     }
 
-    // 이미지 저장 기능 함수
-    function downloadAdminImage() {
+    // ⭐ 수정된 이미지 저장 기능 (전체 테이블 캡처)
+    async function downloadAdminImage() {
         const area = document.getElementById('admin-capture-area');
-        toast("이미지를 생성 중입니다...");
-        html2canvas(area, {
-            useCORS: true,
-            backgroundColor: "#FFF9F2",
-            scale: 2 // 화질을 위해 2배 확대
-        }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = `미라클주니_4월_통합현황_${getKSTDate()}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-            toast("이미지가 저장되었습니다! ✨");
-        });
+        const wrapper = document.getElementById('admin-wrapper');
+        const table = document.getElementById('admin-table');
+        
+        toast("전체 현황 이미지를 생성 중입니다... 잠시만 기다려주세요.");
+
+        // 1. 캡처를 위해 잠시 레이아웃 봉인 해제
+        const originalMaxHeight = wrapper.style.maxHeight;
+        const originalOverflow = wrapper.style.overflow;
+        const originalWidth = table.style.width;
+
+        wrapper.style.maxHeight = 'none';
+        wrapper.style.overflow = 'visible';
+        table.style.width = '1200px'; // 테이블이 압축되지 않도록 고정
+
+        // 2. 캡처 실행
+        setTimeout(() => {
+            html2canvas(area, {
+                useCORS: true,
+                backgroundColor: "#FFF9F2",
+                scale: 1.5, // 너무 크면 전송이 힘드니 1.5배로 타협
+                width: area.scrollWidth,
+                height: area.scrollHeight,
+                logging: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `미라클주니_4월_통합현황_${getKSTDate()}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+                // 3. 원래 스타일로 복구
+                wrapper.style.maxHeight = originalMaxHeight;
+                wrapper.style.overflow = originalOverflow;
+                table.style.width = originalWidth;
+
+                toast("전체 현황 저장 완료! ✨");
+            });
+        }, 500); // 렌더링 시간을 위해 아주 잠깐 대기
     }
 </script>
 </body>
