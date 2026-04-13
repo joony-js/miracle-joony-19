@@ -78,7 +78,7 @@
         <button class="download-btn" onclick="downloadAdminImage()">📸 현황 이미지로 저장 (멤버 공유용)</button>
         <div class="card" style="padding:10px;" id="admin-capture-area">
             <div style="text-align:center; font-size:20px; font-weight:900; color:var(--main); margin-bottom:15px;">📊 4월 실시간 통합 현황</div>
-            <div class="admin-wrapper">
+            <div class="admin-wrapper" id="admin-wrapper-area">
                 <table id="admin-table"></table>
             </div>
         </div>
@@ -127,9 +127,7 @@
     function getKSTDate() {
         const now = new Date();
         const kst = new Date(now.getTime() + (9 * 60 * 60 * 1000));
-        const offset = now.getTimezoneOffset() * 60000;
-        const local = new Date(now.getTime() - offset);
-        return local.toISOString().split('T')[0];
+        return kst.toISOString().split('T')[0];
     }
 
     google.charts.load('current', {packages:['corechart']});
@@ -232,16 +230,11 @@
                 if(s !== '대기') dInput++;
             });
 
-            // 색상 로직 수정: 미입력은 흰색, 모든 루틴 패스 시 #e2e2e2
             let color = '#fff';
             if (dInput > 0) {
-                if (dO === items.length) {
-                    color = '#28C76F'; // 모두 성공 (초록)
-                } else if (dP === items.length) {
-                    color = '#e2e2e2'; // 모두 패스 (회색) - 요청사항
-                } else if (dO > 0 || dX > 0 || dP > 0) {
-                    color = '#F1C40F'; // 일부 실천 (노랑)
-                }
+                if (dO === items.length) color = '#28C76F';
+                else if (dP === items.length) color = '#e2e2e2';
+                else if (dO > 0 || dX > 0 || dP > 0) color = '#F1C40F';
             }
             
             grid.innerHTML += `<div class="day-cell" style="background:${color}" onclick="openModal('${name}','${dS}')"><div class="day-num">${i}일</div><div class="day-yo" style="color:${yoColor}">(${YOS[yoNum]})</div></div>`;
@@ -319,20 +312,48 @@
         document.getElementById('btn-adm').classList.toggle('active', m==='admin');
     }
 
-    // 이미지 저장 기능 함수
+    // [중요] 이미지 저장 기능 - 테이블 전체가 나오도록 보정된 로직
     function downloadAdminImage() {
         const area = document.getElementById('admin-capture-area');
-        toast("이미지를 생성 중입니다...");
+        const wrapper = document.getElementById('admin-wrapper-area');
+        
+        toast("고화질 이미지를 생성 중입니다... 잠시만 기다려주세요.");
+
+        // 스크롤 영역을 일시적으로 해제하여 전체 내용이 렌더링되게 함
+        const originalMaxHeight = wrapper.style.maxHeight;
+        const originalOverflow = wrapper.style.overflow;
+        wrapper.style.maxHeight = 'none';
+        wrapper.style.overflow = 'visible';
+
         html2canvas(area, {
             useCORS: true,
             backgroundColor: "#FFF9F2",
-            scale: 2 // 화질을 위해 2배 확대
+            scale: 2, // 고화질 출력
+            width: area.scrollWidth, // 실제 테이블의 가로 전체 너비 반영
+            height: area.scrollHeight, // 실제 테이블의 세로 전체 높이 반영
+            windowWidth: area.scrollWidth, // 윈도우 너비 보정
+            onclone: (clonedDoc) => {
+                // 복제된 문서에서도 스크롤 제한을 풀어 전체가 찍히도록 함
+                const clonedWrapper = clonedDoc.getElementById('admin-wrapper-area');
+                clonedWrapper.style.maxHeight = 'none';
+                clonedWrapper.style.overflow = 'visible';
+            }
         }).then(canvas => {
             const link = document.createElement('a');
             link.download = `미라클주니_4월_통합현황_${getKSTDate()}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
-            toast("이미지가 저장되었습니다! ✨");
+            
+            // 원래 스타일로 복구
+            wrapper.style.maxHeight = originalMaxHeight;
+            wrapper.style.overflow = originalOverflow;
+            
+            toast("이미지 저장 완료! ✨");
+        }).catch(err => {
+            console.error(err);
+            toast("이미지 저장 중 오류가 발생했습니다.");
+            wrapper.style.maxHeight = originalMaxHeight;
+            wrapper.style.overflow = originalOverflow;
         });
     }
 </script>
