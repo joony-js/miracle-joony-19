@@ -169,7 +169,7 @@
     google.charts.load('current', {packages:['corechart']});
     google.charts.setOnLoadCallback(() => {
         const sel = document.getElementById('userSelect');
-        Object.keys(MEMBERS).sort().forEach(m => sel.add(new Option(m, m)));
+        Object.keys(MEMBERS).forEach(m => sel.add(new Option(m, m)));
         const d = getKST().getDate();
         document.getElementById('quote-text').innerText = QUOTES[d] ? QUOTES[d][0] : QUOTES[1][0];
         document.getElementById('quote-author').innerText = `- ${QUOTES[d] ? QUOTES[d][1] : QUOTES[1][1]} -`;
@@ -288,7 +288,7 @@
         let h = '<thead><tr><th class="sticky-name">멤버</th><th>루틴</th>';
         for(let i=1; i<=31; i++) h += `<th>${i}</th>`;
         h += '</tr></thead><tbody>';
-        Object.keys(MEMBERS).sort().forEach(name => {
+        Object.keys(MEMBERS).forEach(name => {
             MEMBERS[name].items.forEach((r, idx) => {
                 h += `<tr>`;
                 if(idx===0) h += `<td class="sticky-name" rowspan="${MEMBERS[name].items.length}">${name}</td>`;
