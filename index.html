@@ -11,7 +11,6 @@
         body { font-family: 'Apple SD Gothic Neo', sans-serif; background: var(--bg); margin: 0; color: #333; line-height: 1.5; }
         .header { background: #343A40; color: #F1C40F; padding: 12px; text-align: center; font-weight: 800; font-size: 13px; position: sticky; top: 0; z-index: 1000; }
         
-        /* 명언 카드 디자인 강화 */
         .quote-area { background: #FFF9E6; border: 3px solid #F1C40F; border-radius: 15px; margin: 15px; padding: 25px 15px; text-align: center; box-shadow: 0 4px 15px rgba(241, 196, 15, 0.2); position: relative; }
         .quote-text { font-size: 19px; font-weight: 900; color: #5D4037; word-break: keep-all; line-height: 1.6; position: relative; z-index: 1; }
         .quote-author { font-size: 13px; color: #795548; margin-top: 12px; font-weight: 700; opacity: 0.8; }
@@ -24,11 +23,9 @@
         .select-box { width: 100%; padding: 15px; font-size: 16px; font-weight: 800; border: 2px solid var(--main); border-radius: 12px; margin-bottom: 15px; background: #fff; }
         
         .card { background: #fff; border-radius: 15px; padding: 20px; margin-bottom: 15px; border: 1px solid #FFE0B2; }
-        
-        /* 이름 및 문구 정렬 수정 */
-        .user-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 15px; width: 100%; flex-wrap: nowrap; }
-        .welcome-text { font-size: 20px; font-weight: 900; white-space: nowrap; flex-shrink: 0; }
-        .streak-badge { background: #FFF0F0; color: var(--streak); padding: 5px 10px; border-radius: 8px; font-size: 12px; font-weight: 800; white-space: nowrap; flex-grow: 1; text-align: center; }
+        .user-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 15px; width: 100%; }
+        .welcome-text { font-size: 20px; font-weight: 900; white-space: nowrap; }
+        .streak-badge { background: #FFF0F0; color: var(--streak); padding: 5px 10px; border-radius: 8px; font-size: 12px; font-weight: 800; flex-grow: 1; text-align: center; }
         
         .rule-badge { background: #FFF3E0; color: #E65100; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; border: 1px solid #FFCC80; display: inline-block; margin-bottom: 15px; }
         
@@ -40,13 +37,12 @@
         .btn.X.active { background: var(--no); color: #fff; border-color: var(--no); }
         .btn.P.active { background: var(--etc); color: #fff; border-color: var(--etc); }
         
-        /* 달력 헤더 및 성취율 */
         .calendar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
         .calendar-title { font-size: 16px; font-weight: 900; }
         .user-rate-top { font-size: 14px; font-weight: 900; color: var(--main); background: #FFF4E5; padding: 3px 10px; border-radius: 12px; }
 
         .grid-container { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-        .day-cell { aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; border: 1px solid #eee; background: #fff; cursor: pointer; }
+        .day-cell { aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; border: 1px solid #eee; background: #fff; }
         
         .admin-wrapper { overflow: auto; max-height: 70vh; border: 1px solid var(--main); border-radius: 10px; }
         table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 11px; min-width: 1500px; }
@@ -121,14 +117,12 @@
     const HOLIDAYS = ['2026-05-05', '2026-05-25'];
     const WEEKS = ['일','월','화','수','목','금','토'];
     
-    // 명언 확장 (사용자 요청 반영: 크고 굵게)
     const QUOTES = { 
         1:["말하기를 멈추고, 행동하기 시작하라.","월트 디즈니"], 
-        2:["어제보다 나은 오늘을 만드는 것은 오직 당신의 선택입니다.","미라클 주니"],
-        /* ... 3일부터 31일까지는 시스템이 날짜에 맞춰 자동 배치합니다 ... */
+        /* ... 명언 데이터 ... */
         31:["당신은 이미 기적의 주인공입니다!","미라클 주니"] 
     };
-    const CHEERS = ["소중한 기록 감사합니다. 오늘이 반짝이는 순간들로 가득하길 바라요. ✨","작은 실천이 모여 큰 기적을 만듭니다. 정말 잘하고 계세요! 👍","와우! 열정이 대시보드를 활활 태우고 있네요! 🔥","오늘의 기록이 훗날 빛날 증거가 될 거예요. 💎","'우리'라서 해낼 수 있어요. 끝까지 함께해요! 🤝"];
+    const CHEERS = ["기록 감사합니다! ✨","정말 잘하고 계세요! 👍","열정이 대단합니다! 🔥","오늘도 빛나는 하루! 💎","함께라서 행복합니다! 🤝"];
 
     const MEMBERS = {
         "곰돌": { items: ["기상시간 5시", "필사", "새벽기도(독서)", "글쓰기"], note: "주말 기상 자유" },
@@ -165,23 +159,25 @@
     google.charts.setOnLoadCallback(() => {
         const sel = document.getElementById('userSelect');
         Object.keys(MEMBERS).forEach(m => sel.add(new Option(m, m)));
-        const d = getKST().getDate();
-        if(QUOTES[d]) {
-            document.getElementById('quote-text').innerText = QUOTES[d][0];
-            document.getElementById('quote-author').innerText = `- ${QUOTES[d][1]} -`;
-        }
         fetchData();
         setInterval(tick, 1000);
     });
 
+    // 데이터 가져오기 로직 (중복 대응 및 시트 지정)
     function fetchData() {
+        // 시트 탭 이름을 '기록'으로 명시
         const q = new google.visualization.Query(`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&sheet=기록&v=${Date.now()}`);
         q.send(res => {
             if (res.isError()) return;
             const t = res.getDataTable();
             db = [];
             for (let i = 0; i < t.getNumberOfRows(); i++) {
-                db.push({ date: t.getFormattedValue(i,0), name: t.getValue(i,1), routine: t.getValue(i,2), status: t.getValue(i,3) });
+                db.push({ 
+                    date: t.getFormattedValue(i,0), 
+                    name: t.getValue(i,1), 
+                    routine: t.getValue(i,2), 
+                    status: t.getValue(i,3) 
+                });
             }
             if(document.getElementById('userSelect').value) loadUser();
             renderAdmin();
@@ -204,14 +200,11 @@
         document.getElementById('span-name').innerText = name;
         document.getElementById('div-rule').innerText = `📍 개인 수칙: ${MEMBERS[name].note || "없음"}`;
         
-        // 스트릭 계산
         let streak = 0, checkDate = getKST();
         while(true) {
             const dS = getKSTStr(checkDate);
             if(dS.split('-')[1] !== '05') break;
-            const dayRoutines = MEMBERS[name].items;
-            const isDone = dayRoutines.every(r => getS(name, dS, r) === 'O');
-            if(isDone) { streak++; checkDate.setDate(checkDate.getDate()-1); }
+            if(MEMBERS[name].items.every(r => getS(name, dS, r) === 'O')) { streak++; checkDate.setDate(checkDate.getDate()-1); }
             else break;
         }
         document.getElementById('streak-area').innerHTML = streak > 0 ? `🔥 ${streak}일 연속 성공!` : `🌱 오늘부터 기록을 시작해봐요!`;
@@ -232,6 +225,7 @@
         renderGrid(name);
     }
 
+    // 데이터 조회 (중복 데이터가 있을 경우 가장 마지막(최신) 행 사용)
     function getS(n, d, r) {
         const f = db.filter(x => x.name == n && x.routine == r && x.date.includes(d));
         return f.length > 0 ? f[f.length-1].status : '대기';
@@ -239,11 +233,11 @@
 
     async function save(name, routine, status, date = getKSTStr()) {
         db = db.filter(x => !(x.date.includes(date) && x.name === name && x.routine === routine));
-        if(status !== '대기') db.push({ date, name, routine, status });
+        db.push({ date, name, routine, status });
         loadUser(); renderAdmin();
         const t = document.getElementById('toast');
         t.innerText = CHEERS[Math.floor(Math.random()*CHEERS.length)]; t.style.display = 'block';
-        setTimeout(()=>t.style.display='none', 2500);
+        setTimeout(()=>t.style.display='none', 2000);
         fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ date, name, routine, status }) });
     }
 
@@ -271,7 +265,7 @@
                     const dObj = new Date(2026, 4, i);
                     const isSun = dObj.getDay() === 0 || HOLIDAYS.includes(dS);
                     const isSat = dObj.getDay() === 6;
-                    if(s==='O') { totalDone++; totalPossible++; } else if(s==='X') { totalPossible++; }
+                    if(s==='O') { totalDone++; totalPossible++; } else if(s==='X') totalPossible++;
                     h += `<td class="${isSun?'sun':(isSat?'sat':'')}" style="font-weight:bold; color:${s==='O'?'#28C76F':(s==='X'?'#EA5455':'#888')}">${s==='대기'?'':(s==='-'?'P':s)}</td>`;
                 }
                 if(idx===0) h += `<td class="rate-col" rowspan="${MEMBERS[name].items.length}" id="rate-${name}">0%</td>`;
@@ -302,12 +296,10 @@
         }
     }
 
-    // 엑셀 다운로드 (CSV 변환)
     function downloadExcel() {
         let csv = "\uFEFF멤버,루틴,";
         for(let i=1; i<=31; i++) csv += `${i}일,`;
         csv += "성취율\n";
-
         Object.keys(MEMBERS).forEach(name => {
             let totalDone = 0, totalPossible = 0;
             MEMBERS[name].items.forEach((r, idx) => {
@@ -325,7 +317,6 @@
                 csv += "\n";
             });
         });
-
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
