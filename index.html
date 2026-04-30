@@ -150,7 +150,7 @@
     google.charts.load('current', {packages:['corechart']});
     google.charts.setOnLoadCallback(() => {
         const sel = document.getElementById('userSelect');
-        Object.keys(MEMBERS).sort().forEach(m => sel.add(new Option(m, m)));
+        Object.keys(MEMBERS).forEach(m => sel.add(new Option(m, m)));
         const d = getKST().getDate();
         if(QUOTES[d]) {
             document.getElementById('quote-text').innerText = QUOTES[d][0];
@@ -243,7 +243,7 @@
         }
         h += '<th rowspan="2" class="rate-col">성취율</th></tr></thead><tbody>';
 
-        Object.keys(MEMBERS).sort().forEach(name => {
+        Object.keys(MEMBERS).forEach(name => {
             let totalPossible = 0, totalDone = 0;
             MEMBERS[name].items.forEach((r, idx) => {
                 h += `<tr>`;
