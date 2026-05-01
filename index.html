@@ -15,61 +15,55 @@
         .header { background: #343A40; color: #F1C40F; padding: 12px; text-align: center; font-weight: 800; font-size: 13px; position: sticky; top: 0; z-index: 1000; }
         #missing-alert { background: #FFF4F4; border: 1.5px solid #FFADAD; color: #D63031; margin: 10px 15px 0; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 800; text-align: center; display: none; }
 
-        .quote-area { background: #FFF9E6; border: 3px solid #F1C40F; border-radius: 15px; margin: 15px; padding: 30px 15px; text-align: center; }
-        .quote-text { font-size: 20px; font-weight: 900; color: #3E2723; word-break: keep-all; line-height: 1.4; }
-        .quote-author { font-size: 14px; color: #795548; margin-top: 12px; font-weight: 700; }
+        .quote-area { background: #FFF9E6; border: 3px solid #F1C40F; border-radius: 15px; margin: 15px; padding: 25px 15px; text-align: center; }
+        .quote-text { font-size: 18px; font-weight: 900; color: #5D4037; word-break: keep-all; }
+        .quote-author { font-size: 13px; color: #795548; margin-top: 10px; font-weight: 700; }
 
         .nav { display: flex; gap: 8px; padding: 10px; background: #fff; }
-        .nav-item { flex: 1; padding: 12px; text-align: center; font-weight: 800; border-radius: 10px; background: #E9ECEF; color: #495057; border: none; font-size: 13px; }
+        .nav-item { flex: 1; padding: 12px; text-align: center; font-weight: 800; border-radius: 10px; background: #E9ECEF; color: #495057; border: none; font-size: 13px; cursor: pointer; }
         .nav-item.active { background: var(--main); color: #fff; }
         
         .content { padding: 15px; }
         .select-box { width: 100%; padding: 15px; font-size: 16px; font-weight: 800; border: 2px solid var(--main); border-radius: 12px; margin-bottom: 10px; }
         
-        .user-info-row { display: flex; align-items: center; justify-content: flex-start; gap: 15px; margin-bottom: 12px; }
-        .welcome-text { font-size: 20px; font-weight: 900; }
-        .streak-area { font-size: 18px; font-weight: 900; color: var(--streak); animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .user-info-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .welcome-text { font-size: 19px; font-weight: 900; }
+        .streak-area { font-size: 17px; font-weight: 900; color: var(--streak); }
 
-        .stat-row { background: #f8f9fa; padding: 12px; border-radius: 10px; margin-bottom: 15px; font-size: 14px; font-weight: 800; display: flex; justify-content: space-around; border: 1px solid #eee; }
+        .stat-row { background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; font-weight: 700; display: flex; justify-content: space-around; border: 1px solid #eee; }
 
-        .card { background: #fff; border-radius: 15px; padding: 15px; margin-bottom: 15px; border: 1px solid #FFE0B2; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f9f9f9; }
-        .item span { font-weight: 700; font-size: 15px; }
-        .btn-group { display: flex; gap: 6px; }
-        .btn { width: 42px; height: 42px; border-radius: 10px; border: 1px solid #eee; font-weight: 900; background: #fff; color: #ccc; font-size: 16px; }
+        .card { background: #fff; border-radius: 15px; padding: 15px; margin-bottom: 15px; border: 1px solid #FFE0B2; }
+        .item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f9f9f9; }
+        .btn-group { display: flex; gap: 4px; }
+        .btn { width: 40px; height: 40px; border-radius: 8px; border: 1px solid #eee; font-weight: 900; background: #fff; color: #ccc; cursor: pointer; }
         .btn.O.active { background: var(--ok); color: #fff; border-color: var(--ok); }
         .btn.X.active { background: var(--no); color: #fff; border-color: var(--no); }
         .btn.P.active { background: var(--etc); color: #fff; border-color: var(--etc); }
 
-        .grid-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 12px; font-weight: 800; margin-bottom: 8px; }
-        .grid-container { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-        .day-cell { height: 55px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; border: 1px solid #eee; background: #fff; position: relative; cursor: pointer; }
-        .day-label { font-size: 9px; margin-top: 2px; font-weight: 600; opacity: 0.7; }
+        .grid-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; font-weight: 800; margin-bottom: 5px; }
+        .grid-container { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        .day-cell { height: 50px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; border: 1px solid #eee; background: #fff; position: relative; cursor: pointer; }
         .day-cell.sun { color: #e74c3c; background: #fff5f5; }
         .day-cell.sat { color: #2980b9; background: #f0f7ff; }
         .day-cell.holiday { color: #e74c3c; }
-        .day-cell.selected { border: 3px solid var(--main); z-index: 10; box-shadow: 0 0 8px rgba(255,159,67,0.4); }
+        .day-cell.selected { border: 2.5px solid var(--main); z-index: 10; }
 
         .admin-controls { display: flex; gap: 10px; margin-bottom: 15px; }
-        .admin-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 800; color: #fff; font-size: 13px; cursor: pointer; }
+        .admin-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; font-weight: 800; color: #fff; font-size: 12px; cursor: pointer; }
         .btn-cap { background: #6c5ce7; }
         .btn-xls { background: #27ae60; }
         #admin-table { width: 100%; border-collapse: collapse; font-size: 10px; text-align: center; border: 1px solid #ddd; }
-        #admin-table th, #admin-table td { border: 1px solid #eee; padding: 8px 2px; }
+        #admin-table th, #admin-table td { border: 1px solid #eee; padding: 6px 2px; }
         #admin-table th { background: #f8f9fa; }
+        .clickable-name { color: #007bff; text-decoration: underline; cursor: pointer; }
 
-        .footer-note { font-size: 12px; color: #666; text-align: center; margin-top: 10px; font-weight: 700; line-height: 1.6; background: #fefefe; padding: 10px; border-radius: 10px; }
-        .special-rule { color: #d35400; display: block; margin-top: 5px; }
-
+        .footer-note { font-size: 12px; color: #888; text-align: center; margin-top: 10px; font-weight: 700; line-height: 1.4; }
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 13px; display: none; z-index: 2000; font-weight: 700; width: 80%; text-align: center; }
+        
         /* 모달 스타일 */
-        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); }
-        .modal-content { background: #fff; margin: 20% auto; padding: 20px; border-radius: 15px; width: 85%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .modal-header { font-size: 18px; font-weight: 900; margin-bottom: 15px; border-bottom: 2px solid var(--main); padding-bottom: 8px; }
-        .modal-body { font-size: 14px; font-weight: 700; line-height: 1.8; }
-        .modal-close { background: var(--main); color: #fff; border: none; padding: 10px; width: 100%; border-radius: 10px; margin-top: 15px; font-weight: 800; }
-
-        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.85); color: #fff; padding: 15px 25px; border-radius: 12px; font-size: 14px; display: none; z-index: 4000; font-weight: 700; width: 85%; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: #fff; margin: 15% auto; padding: 20px; border-radius: 15px; width: 85%; max-width: 400px; }
+        .modal-header { font-weight: 900; font-size: 16px; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -99,14 +93,15 @@
                 </div>
                 <div class="stat-row">
                     <span>🔥 현재까지 성취율: <span id="stat-rate">0</span>%</span>
-                    <span>🔘 패스: <span id="stat-pass">0</span>회</span>
+                    <span>🔘 패스: <span id="stat-pass">0</span>회 제외</span>
                 </div>
                 <div id="routine-list"></div>
-                <div class="footer-note" id="member-rule"></div>
+                <div id="personal-note" class="footer-note" style="color: #FF9F43; margin-bottom: 10px;"></div>
+                <div class="footer-note">📢 주말/공휴일은 자유 루틴입니다.<br>완료하신 루틴을 기록하거나 패스를 체크해 주세요.</div>
             </div>
 
             <div class="card">
-                <div style="font-weight:900; margin-bottom:12px;">📅 5월 루틴 달력(날짜 클릭 시 상세 기록)</div>
+                <div style="font-weight:900; margin-bottom:10px;">📅 5월 루틴 달력(날짜 클릭 시 기록 조회)</div>
                 <div class="grid-header">
                     <div style="color:#e74c3c">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div style="color:#2980b9">토</div>
                 </div>
@@ -124,15 +119,20 @@
         <div class="card" id="capture-area" style="overflow:auto; padding:10px;">
             <table id="admin-table"></table>
         </div>
+        <!-- 관리자용 상세 수정 영역 -->
+        <div id="admin-edit-area" class="card" style="display:none;">
+            <div style="font-weight:900; margin-bottom:10px;">🛠 <span id="admin-edit-name"></span>님 루틴 수정 (<span id="admin-edit-date"></span>)</div>
+            <div id="admin-routine-list"></div>
+        </div>
     </div>
 </div>
 
-<!-- 상세 기록 모달 -->
-<div id="logModal" class="modal">
-    <div class="modal-content">
-        <div id="modalHeader" class="modal-header"></div>
-        <div id="modalBody" class="modal-body"></div>
-        <button class="modal-close" onclick="closeModal()">닫기</button>
+<!-- 상세 조회 모달 -->
+<div id="dayModal" class="modal" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header" id="modalDate"></div>
+        <div id="modalBody"></div>
+        <button class="admin-btn btn-cap" style="width:100%; margin-top:15px;" onclick="closeModal()">닫기</button>
     </div>
 </div>
 
@@ -143,30 +143,30 @@
     const SID = "1naH8MKtag1s1n9EUXy2xL0dlxq9DqZCIKpEkne32tuU";
     
     const MEMBERS = {
-        "사랑주니": { items: ["기상시간 4시", "명상&스트레칭", "글쓰기", "독서", "달리기(걷기)"], rule: "매일 아침의 기적!" },
-        "곰돌": { items: ["기상시간 5시", "필사", "새벽기도(독서)", "글쓰기"], rule: "주말/공휴일 자유 루틴" },
-        "글터지기": { items: ["기상시간 5시", "독서", "글쓰기", "산책 (주3회)", "취침 10:30분 이전"], rule: "일요일 루틴 자유" },
-        "꿈젤라": { items: ["기상시간 6시", "양치&긍정확언", "달리기", "독서", "다이어리 쓰기"], rule: "주말/공휴일 자유 루틴" },
-        "날위한나": { items: ["기상시간 6시30분", "아침필사", "글쓰기", "취침시간 11시 이전"], rule: "주말/공휴일 자유 루틴" },
-        "낭만다정": { items: ["기상시간 6시", "독서(운동or글쓰기)"], rule: "일요일 루틴 자유" },
-        "들꽃향기": { items: ["글쓰기", "독서", "스트레칭(걷기)", "취침 10:30분 이전"], rule: "주말 기상 자유" },
-        "보름달": { items: ["기상시간 5시20분", "독서", "필사"], rule: "주말/공휴일 자유 루틴" },
-        "비채꿈": { items: ["기상시간 5시30분", "독서", "필사", "경전 읽기", "글쓰기"], rule: "주말/공휴일 자유 루틴" },
-        "사랑초": { items: ["기상시간 6시", "독서", "글쓰기", "걷기(수영)"], rule: "주말/공휴일 자유 루틴" },
-        "써니허니": { items: ["기상시간 6시", "독서", "공부", "스트레칭&명상"], rule: "주말/공휴일 자유 루틴" },
-        "아테네": { items: ["기상시간 6시", "운동", "명상", "독서"], rule: "주말/공휴일 자유 루틴" },
-        "앨리스샘": { items: ["기상시간 4시", "걷기(달리기)", "글쓰기(독서)"], rule: "주말/공휴일 자유 루틴" },
-        "열정부메랑": { items: ["기상시간 4시30분", "운동(헬스)"], rule: "주말 기상 자유" },
-        "열정소피아": { items: ["기상시간 4시", "독서", "새벽기도", "스트레칭"], rule: "주말/공휴일 자유 루틴" },
-        "오빛다": { items: ["기상시간 4시", "영어 공부&리딩", "독서", "필사", "걷기"], rule: "주말 기상 자유" },
-        "오시연": { items: ["기상시간 6시", "스트레칭&간단한 운동"], rule: "일요일 루틴 자유" },
-        "윤슬": { items: ["기상시간 6시30분", "독서", "글쓰기"], rule: "주말 기상 자유" },
-        "즐거운호호씨": { items: ["기상시간 7시", "필사", "말씀"], rule: "주말/공휴일 자유 루틴" },
-        "지금사랑": { items: ["기상시간 6시", "독서", "식단조절"], rule: "주말 기상 자유" },
-        "탈렌트수니": { items: ["기상시간 6시", "걷기(달리기)", "독서", "말씀산책"], rule: "주말 기상 자유" },
-        "하니오웰": { items: ["기상시간 6시", "독서", "글쓰기"], rule: "주말/공휴일 자유 루틴" },
-        "mam 마음": { items: ["기상시간 6시", "글쓰기", "걷기"], rule: "주말 기상 자유" },
-        "bgmsunny": { items: ["기상시간 5시30분", "명상", "스트레칭(요가)"], rule: "주말/공휴일 자유 루틴" }
+        "사랑주니": { items: ["기상시간 4시", "명상&스트레칭", "글쓰기", "독서", "달리기(걷기)"], note: "운영자 루틴" },
+        "곰돌": { items: ["기상시간 5시", "필사", "새벽기도(독서)", "글쓰기"], note: "주말 기상 자유" },
+        "글터지기": { items: ["기상시간 5시", "독서", "글쓰기", "산책 (주3회)", "취침시간 10시30분 이전"], note: "일요일 루틴 자유" },
+        "날위한나": { items: ["기상시간 6시30분", "아침필사", "글쓰기", "취침시간 11시 이전"], note: "" },
+        "낭만다정": { items: ["기상시간 6시", "독서(운동or글쓰기)"], note: "주말 루틴 자유" },
+        "들꽃향기": { items: ["글쓰기", "독서", "스트레칭(걷기)", "취침시간 10시30분 이전"], note: "주말 루틴 자유" },
+        "보름달": { items: ["기상시간 5시20분", "독서", "필사"], note: "주말 루틴 자유" },
+        "비채꿈": { items: ["기상시간 5시30분", "독서", "필사", "경전 읽기", "글쓰기"], note: "주말 루틴 자유" },
+        "사랑초": { items: ["기상시간 6시", "독서", "글쓰기", "걷기(수영)"], note: "주말 루틴 자유" },
+        "써니허니": { items: ["기상시간 6시", "독서", "공부", "스트레칭&명상"], note: "주말 루틴 자유" },
+        "아테네": { items: ["기상시간 6시", "운동", "명상", "독서"], note: "" },
+        "꿈젤라": { items: ["기상시간 6시", "양치&긍정확언", "달리기", "독서", "다이어리 쓰기"], note: "일요일 루틴 자유" },
+        "앨리스샘": { items: ["기상시간 4시", "걷기(달리기)", "글쓰기(독서)"], note: "주말 루틴 자유" },
+        "열정부메랑": { items: ["기상시간 4시30분", "운동(헬스)"], note: "주말 루틴 자유" },
+        "열정소피아": { items: ["기상시간 4시", "독서", "새벽기도", "스트레칭"], note: "" },
+        "오빛다": { items: ["기상시간 4시", "영어 공부&리딩", "독서", "필사", "걷기"], note: "주말 루틴 자유" },
+        "오시연": { items: ["기상시간 6시", "스트레칭&간단한 운동"], note: "" },
+        "윤슬": { items: ["기상시간 6시30분", "독서", "글쓰기"], note: "주말 기상 7시30분" },
+        "즐거운호호씨": { items: ["기상시간 7시", "필사", "말씀"], note: "주말 루틴 자유" },
+        "지금사랑": { items: ["기상시간 6시", "독서", "식단조절"], note: "주말 루틴 자유" },
+        "탈렌트수니": { items: ["기상시간 6시", "걷기(달리기)", "독서", "말씀산책"], note: "" },
+        "하니오웰": { items: ["기상시간 6시", "독서", "글쓰기"], note: "주말 루틴 자유" },
+        "mam 마음": { items: ["기상시간 6시", "글쓰기", "걷기"], note: "" },
+        "bgmsunny": { items: ["기상시간 5시30분", "명상", "스트레칭(요가)"], note: "" }
     };
 
     const QUOTES = {
@@ -192,10 +192,7 @@
     ];
 
     let db = [];
-    let selectedDate = getKSTStr();
-
-    function getKST() { return new Date(new Date().getTime() + (9*60*60*1000)); }
-    function getKSTStr(d = getKST()) { return d.toISOString().split('T')[0]; }
+    let selectedDate = new Date().toLocaleDateString('sv-SE'); // KST 안전 날짜
 
     google.charts.load('current', {packages:['corechart']});
     google.charts.setOnLoadCallback(() => {
@@ -211,7 +208,7 @@
     });
 
     function setQuote() {
-        const d = getKST().getDate();
+        const d = new Date().getDate();
         const q = QUOTES[d] || QUOTES[1];
         document.getElementById('quote-text').innerText = `"${q[0]}"`;
         document.getElementById('quote-author').innerText = `- ${q[1]} -`;
@@ -240,17 +237,17 @@
         if(!name) return;
         document.getElementById('userArea').style.display = 'block';
         document.getElementById('span-name').innerText = name;
-        document.getElementById('member-rule').innerHTML = `📢 <b>${name}님 특칙:</b> ${MEMBERS[name].rule}<br><span class='special-rule'>주말 및 공휴일은 기록하지 않아도 스트릭이 유지됩니다.</span>`;
+        document.getElementById('personal-note').innerText = MEMBERS[name].note ? `💡 ${MEMBERS[name].note}` : "";
 
-        const yesterday = new Date(getKST()); yesterday.setDate(yesterday.getDate()-1);
-        const yStr = getKSTStr(yesterday);
-        const isMay = yStr.includes("-05-");
-        const missing = isMay && MEMBERS[name].items.some(r => getLatestS(name, yStr, r) === '');
+        // 어제 누락 알림
+        const yest = new Date(); yest.setDate(yest.getDate()-1);
+        const yStr = yest.toLocaleDateString('sv-SE');
+        const missing = yStr.includes("-05-") && MEMBERS[name].items.some(r => getLatestS(name, yStr, r) === '');
         document.getElementById('missing-alert').style.display = missing ? 'block' : 'none';
 
-        let streak = 0, totalO = 0, totalP = 0, totalValidItems = 0;
+        let streak = 0, totalO = 0, totalP = 0, totalValid = 0;
         const items = MEMBERS[name].items;
-        const todayStr = getKSTStr();
+        const todayStr = new Date().toLocaleDateString('sv-SE');
 
         for(let i=0; i<31; i++) {
             const ds = `2026-05-${String(i+1).padStart(2,'0')}`;
@@ -260,15 +257,15 @@
             if(ds <= todayStr) {
                 items.forEach(r => {
                     const s = getLatestS(name, ds, r);
-                    if(s==='O') totalO++;
+                    if(s==='O') totalO++; 
                     if(s==='-') totalP++;
-                    if(s !== '-') totalValidItems++; // 패스(-)는 분모에서 제외
+                    if(s !== '-') totalValid++; // 패스 제외한 분모 계산
                 });
             }
         }
         
-        document.getElementById('streak-area').innerHTML = streak > 0 ? `🔥 연속 ${streak}일!` : "🌱 환영합니다!";
-        document.getElementById('stat-rate').innerText = totalValidItems ? Math.round((totalO / totalValidItems) * 100) : 0;
+        document.getElementById('streak-area').innerHTML = streak > 0 ? `🔥 연속 ${streak}일 달성!` : "🌱 기록을 시작해보세요";
+        document.getElementById('stat-rate').innerText = totalValid ? Math.round((totalO / totalValid) * 100) : 0;
         document.getElementById('stat-pass').innerText = totalP;
 
         const list = document.getElementById('routine-list');
@@ -287,47 +284,52 @@
     function renderGrid(name) {
         const grid = document.getElementById('mini-grid'); grid.innerHTML = "";
         const holidays = ["2026-05-05", "2026-05-24", "2026-05-25"];
-        const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
         for(let i=1; i<=31; i++) {
             const d = new Date(2026, 4, i);
-            const ds = getKSTStr(d);
+            const ds = d.toLocaleDateString('sv-SE');
             const isSun = d.getDay() === 0, isSat = d.getDay() === 6, isHol = holidays.includes(ds);
-            const items = MEMBERS[name].items;
-            let dO = 0; items.forEach(r => { if(getLatestS(name, ds, r)==='O') dO++; });
             
-            let bg = dO === items.length && dO > 0 ? '#D1FADF' : (dO > 0 ? '#FEF0C7' : '#fff');
+            let dO = 0, dP = 0;
+            MEMBERS[name].items.forEach(r => { 
+                const s = getLatestS(name, ds, r);
+                if(s==='O') dO++; 
+                if(s==='-') dP++;
+            });
+            
+            let bg = (dO + dP === MEMBERS[name].items.length && dO > 0) ? '#D1FADF' : (dO > 0 ? '#FEF0C7' : '#fff');
             
             grid.innerHTML += `<div class="day-cell ${isSun?'sun':''} ${isSat?'sat':''} ${isHol?'holiday':''} ${selectedDate===ds?'selected':''}" 
-                style="background:${bg}" onclick="openDayLog('${name}','${ds}')">
-                ${i}<span class="day-label">${isHol?'휴일':dayNames[d.getDay()]}</span></div>`;
+                style="background:${bg}" onclick="openDayModal('${name}','${ds}')">${i}${isHol?'<span style="font-size:8px">휴일</span>':''}</div>`;
         }
     }
 
-    function openDayLog(name, date) {
+    function openDayModal(name, date) {
         selectedDate = date;
         loadUser();
-        const items = MEMBERS[name].items;
+        const modal = document.getElementById('dayModal');
+        const mDate = document.getElementById('modalDate');
+        const mBody = document.getElementById('modalBody');
+        
+        mDate.innerText = `📅 ${date} 기록 상세`;
         let html = "";
-        items.forEach(r => {
-            const s = getLatestS(name, date, r) || "미입력";
-            const color = s==='O'?'#28C76F':(s==='X'?'#EA5455':'#888');
-            html += `<div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                        <span>${r}</span>
-                        <b style="color:${color}">${s}</b>
+        MEMBERS[name].items.forEach(r => {
+            const s = getLatestS(name, date, r) || "미기입";
+            html += `<div style="padding:8px 0; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
+                        <span>${r}</span><b>${s}</b>
                      </div>`;
         });
-        document.getElementById('modalHeader').innerText = `${date} 상세 기록`;
-        document.getElementById('modalBody').innerHTML = html;
-        document.getElementById('logModal').style.display = 'block';
+        mBody.innerHTML = html;
+        modal.style.display = 'block';
     }
 
-    function closeModal() { document.getElementById('logModal').style.display = 'none'; }
+    function closeModal() { document.getElementById('dayModal').style.display = 'none'; }
 
     async function save(name, routine, status) {
         db.push({ date: selectedDate, name, routine, status });
         loadUser();
         showToast(CHEERS[Math.floor(Math.random()*CHEERS.length)]);
         fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ date: selectedDate, name, routine, status }) });
+        setTimeout(fetchData, 1500); // 실시간 갱신 보조
     }
 
     function showToast(m) {
@@ -350,12 +352,17 @@
         h += '<th>%</th></tr>';
         
         Object.keys(MEMBERS).sort((a,b) => (a==="사랑주니"?-1:b==="사랑주니"?1:a.localeCompare(b,'ko'))).forEach(n => {
-            h += `<tr><td style="font-weight:bold">${n}</td>`;
+            h += `<tr><td class="clickable-name" onclick="showAdminEdit('${n}')">${n}</td>`;
             let okDays = 0;
             for(let i=1; i<=31; i++) {
                 const ds = `2026-05-${String(i).padStart(2,'0')}`;
-                const allOk = MEMBERS[n].items.every(r => getLatestS(n, ds, r) === 'O');
-                if(allOk) { h += '<td style="background:#d1fadf">✅</td>'; okDays++; }
+                const allOk = MEMBERS[n].items.every(r => {
+                    const s = getLatestS(n, ds, r);
+                    return s === 'O' || s === '-';
+                });
+                const hasAny = MEMBERS[n].items.some(r => getLatestS(n, ds, r) !== '');
+                if(hasAny && allOk) { h += '<td style="background:#d1fadf">✅</td>'; okDays++; }
+                else if(hasAny) h += '<td style="background:#fef0c7">🟡</td>';
                 else h += '<td></td>';
             }
             h += `<td style="font-weight:bold">${Math.round((okDays/31)*100)}</td></tr>`;
@@ -363,17 +370,44 @@
         table.innerHTML = h;
     }
 
+    function showAdminEdit(name) {
+        document.getElementById('admin-edit-area').style.display = 'block';
+        document.getElementById('admin-edit-name').innerText = name;
+        const todayStr = new Date().toLocaleDateString('sv-SE');
+        document.getElementById('admin-edit-date').innerText = todayStr;
+        
+        const list = document.getElementById('admin-routine-list');
+        list.innerHTML = "";
+        MEMBERS[name].items.forEach(r => {
+            const s = getLatestS(name, todayStr, r);
+            list.innerHTML += `<div class="item"><span>${r}</span><div class="btn-group">
+                <button class="btn O ${s==='O'?'active':''}" onclick="adminSave('${name}','${r}','O')">O</button>
+                <button class="btn X ${s==='X'?'active':''}" onclick="adminSave('${name}','${r}','X')">X</button>
+                <button class="btn P ${s==='-'?'active':''}" onclick="adminSave('${name}','${r}','-')">-</button>
+            </div></div>`;
+        });
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    async function adminSave(name, routine, status) {
+        const todayStr = new Date().toLocaleDateString('sv-SE');
+        db.push({ date: todayStr, name, routine, status });
+        showAdminEdit(name);
+        renderAdmin();
+        fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ date: todayStr, name, routine, status }) });
+    }
+
     function capture() {
         html2canvas(document.querySelector("#capture-area")).then(canvas => {
             const link = document.createElement('a');
-            link.download = `미라클주니_20기_현황_${getKSTStr()}.png`;
+            link.download = `미라클주니_20기_현황_${new Date().toLocaleDateString('sv-SE')}.png`;
             link.href = canvas.toDataURL(); link.click();
         });
     }
 
     function exportXls() {
         const wb = XLSX.utils.table_to_book(document.getElementById('admin-table'));
-        XLSX.writeFile(wb, `미라클주니_20기_기록_${getKSTStr()}.xlsx`);
+        XLSX.writeFile(wb, `미라클주니_20기_기록_${new Date().toLocaleDateString('sv-SE')}.xlsx`);
     }
 </script>
 </body>
