@@ -18,6 +18,7 @@
         .quote-area { background: #FFF9E6; border: 3px solid #F1C40F; border-radius: 15px; margin: 15px; padding: 25px 15px; text-align: center; }
         .quote-text { font-size: 18px; font-weight: 900; color: #5D4037; word-break: keep-all; }
         .quote-author { font-size: 13px; color: #795548; margin-top: 10px; font-weight: 700; }
+        .current-date { font-size: 14px; font-weight: 800; color: #333; text-align: center; margin-top: 5px; }
 
         .nav { display: flex; gap: 8px; padding: 10px; background: #fff; }
         .nav-item { flex: 1; padding: 12px; text-align: center; font-weight: 800; border-radius: 10px; background: #E9ECEF; color: #495057; border: none; font-size: 13px; cursor: pointer; }
@@ -56,7 +57,6 @@
         #admin-table th, #admin-table td { border: 1px solid #eee; padding: 4px 1px; min-width: 25px; }
         #admin-table th { background: #fff9f2; padding: 8px 2px; }
         
-        /* 관리자 모드 멤버간 진한 구분선 */
         .member-divider { border-top: 1px solid #141414 !important; }
         
         .clickable-cell { cursor: pointer; }
@@ -76,11 +76,12 @@
 <body>
 
 <div class="header">⏱ 미라클 주니 통합센터</div>
-<div id="missing-alert">💡 어제 기록이 입력되지 않았습니다! 사랑주니님께 문의하세요.</div>
+<div id="missing-alert"></div>
 
 <div class="quote-area">
     <div class="quote-text" id="quote-text">명언 로딩 중...</div>
     <div class="quote-author" id="quote-author"></div>
+    <div class="current-date">2026년 5월 2일 (토)</div>
 </div>
 
 <div class="nav">
@@ -109,10 +110,6 @@
 
             <div class="card">
                 <div style="font-weight:900; margin-bottom:10px;">📅 5월 루틴 달력(날짜 클릭 시 기록 조회)</div>
-                <!-- 요일 나열 글자 삭제 (주석 처리) -->
-                <!-- <div class="grid-header">
-                    <div style="color:#e74c3c">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div style="color:#2980b9">토</div>
-                </div> -->
                 <div id="mini-grid" class="grid-container"></div>
             </div>
         </div>
@@ -240,23 +237,66 @@
         document.getElementById('span-name').innerText = name;
         document.getElementById('personal-note').innerText = `📌 ${name}님의 개인 수칙: ${MEMBERS[name].note || "주말 루틴 자유입니다."}`;
 
-        const yest = new Date(); yest.setDate(yest.getDate()-1);
-        const yStr = yest.toLocaleDateString('sv-SE');
-        const missing = yStr.includes("-05-") && MEMBERS[name].items.some(r => getLatestS(name, yStr, r) === '');
-        document.getElementById('missing-alert').style.display = missing ? 'block' : 'none';
+        // 상단 알림 로직 (어제 미입력 + 누적 횟수)
+        const todayStr = new Date().toLocaleDateString('sv-SE');
+        let missingCount = 0;
+        let isYestMissing = false;
+
+        const checkDate = new Date();
+        for(let i=0; i<31; i++) {
+            checkDate.setDate(new Date().getDate() - i - 1);
+            const dStr = checkDate.toLocaleDateString('sv-SE');
+            if(!dStr.includes("-05-")) break;
+            
+            const dayEntries = MEMBERS[name].items.map(r => getLatestS(name, dStr, r));
+            const isMissing = dayEntries.every(s => s === '');
+            
+            if(isMissing) {
+                missingCount++;
+                if(i === 0) isYestMissing = true;
+            }
+        }
+
+        const alertDiv = document.getElementById('missing-alert');
+        if(isYestMissing) {
+            alertDiv.style.display = 'block';
+            alertDiv.innerText = missingCount > 1 
+                ? `💡 어제 기록이 없습니다! (누락된 기록 총 ${missingCount}회) 사랑주니님께 문의하세요.`
+                : `💡 어제 기록이 없습니다! 사랑주니님께 문의하세요.`;
+        } else {
+            alertDiv.style.display = 'none';
+        }
 
         let streak = 0, totalO = 0, totalValid = 0, totalP = 0;
         const items = MEMBERS[name].items;
-        const todayStr = new Date().toLocaleDateString('sv-SE');
+        let finalMessage = "✨ 오늘의 기록을 시작해보세요!";
 
         for(let i=1; i<=31; i++) {
             const ds = `2026-05-${String(i).padStart(2,'0')}`;
             const dayStatus = items.map(r => getLatestS(name, ds, r));
-            const dayOk = dayStatus.every(s => s === 'O' || s === '-');
-            const dayHasEntry = dayStatus.some(s => s !== '');
-
-            if(dayHasEntry && dayOk) streak++; else if(ds < todayStr) streak = 0;
             
+            const hasO = dayStatus.some(s => s === 'O');
+            const hasX = dayStatus.some(s => s === 'X');
+            const hasP = dayStatus.some(s => s === '-');
+            const hasNone = dayStatus.every(s => s === '');
+
+            // 성공/재충전/재시작 로직 판단
+            if(!hasNone) {
+                if (hasO) {
+                    streak++; // O가 하나라도 있으면 성공 (O+X, O+P 모두 포함)
+                    if(ds === todayStr) finalMessage = `🔥 연속 ${streak}일 달성 중! 오늘도 힘차게!`;
+                } else if (hasP && !hasX) {
+                    streak++; // 전부 패스인 경우 기록은 인정 (재충전)
+                    if(ds === todayStr) finalMessage = `☕ 오늘은 재충전의 날!`;
+                } else {
+                    streak = 0; // X가 포함되고 O가 없는 경우 (X만 있거나 X+P)
+                    if(ds === todayStr) finalMessage = `🌱 괜찮아요! 다시 1일을 만들어요!`;
+                }
+            } else if (ds < todayStr) {
+                streak = 0; // 과거 미입력시 스트릭 끊김
+            }
+            
+            // 통계용
             if(ds <= todayStr) {
                 items.forEach(r => {
                     const s = getLatestS(name, ds, r);
@@ -267,7 +307,7 @@
             }
         }
         
-        document.getElementById('streak-area').innerHTML = streak > 0 ? `🔥 연속 ${streak}일 달성!` : "🌱 기록을 시작해보세요";
+        document.getElementById('streak-area').innerText = finalMessage;
         document.getElementById('stat-rate').innerText = totalValid ? Math.round((totalO / totalValid) * 100) : 0;
         document.getElementById('stat-pass').innerText = totalP;
 
@@ -295,36 +335,28 @@
             const isSun = d.getDay() === 0, isSat = d.getDay() === 6, isHol = holidays.includes(ds);
             const dayName = dayNames[d.getDay()];
 
-            let dO = 0, dP = 0, hasX = false, hasEntry = false;
+            let dO = 0, dP = 0, xCount = 0, hasEntry = false;
             MEMBERS[name].items.forEach(r => { 
                 const s = getLatestS(name, ds, r);
                 if(s !== '') hasEntry = true;
                 if(s==='O') dO++; 
                 if(s==='-') dP++;
-                if(s==='X') hasX = true;
+                if(s==='X') xCount++;
             });
             
-            // 색상 로직 수정 (전부 X일 때 빨간색 추가)
-let bg = '#fff'; 
-if (hasEntry) {
-    // 1. 모든 항목이 X인 경우 (루틴 개수와 X의 개수가 같을 때)
-    const totalItems = MEMBERS[name].items.length;
-    const dX = totalItems - (dO + dP); // 미입력을 제외한 나머지가 X인 상황 체크용 (hasX 활용 가능)
-    
-    // 실제 입력된 값 중 X의 개수를 정확히 파악하기 위해 아래 로직으로 적용하세요.
-    let xCount = 0;
-    MEMBERS[name].items.forEach(r => { if(getLatestS(name, ds, r) === 'X') xCount++; });
-
-    if (xCount === totalItems) {
-        bg = '#FEE4E2'; // 전부 X인 경우 연한 빨간색
-    } else if (hasX || (dO > 0 && dP > 0)) {
-        bg = '#FEF0C7'; // X가 섞여있거나 O/패스 혼합이면 노란색
-    } else if (dO > 0 && dP === 0) {
-        bg = '#D1FADF'; // 모두 O이면 초록색
-    } else if (dO === 0 && dP > 0) {
-        bg = '#F2F4F7'; // 모두 패스이면 회색
-    }
-}
+            let bg = '#fff'; 
+            if (hasEntry) {
+                const totalItems = MEMBERS[name].items.length;
+                if (xCount === totalItems) {
+                    bg = '#FEE4E2'; // 전부 X
+                } else if (xCount > 0 || (dO > 0 && dP > 0)) {
+                    bg = '#FEF0C7'; // 혼합
+                } else if (dO > 0 && dP === 0) {
+                    bg = '#D1FADF'; // 올 O
+                } else if (dO === 0 && dP > 0) {
+                    bg = '#F2F4F7'; // 올 패스
+                }
+            }
 
             grid.innerHTML += `<div class="day-cell ${isSun?'sun':''} ${isSat?'sat':''} ${isHol?'holiday':''} ${selectedDate===ds?'selected':''}" 
                 style="background:${bg}" onclick="openDayModal('${name}','${ds}')">${i}(${dayName})${isHol?'<br><span style="font-size:8px">휴일</span>':''}</div>`;
