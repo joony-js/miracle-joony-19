@@ -284,7 +284,7 @@
 
     function renderGrid(name) {
         const grid = document.getElementById('mini-grid'); grid.innerHTML = "";
-        const holidays = ["2026-05-05", "2026-05-24", "2026-05-25"];
+        const holidays = ["2026-05-05","2026-05-25"];
         for(let i=1; i<=31; i++) {
             const d = new Date(2026, 4, i);
             const ds = d.toLocaleDateString('sv-SE');
@@ -308,7 +308,7 @@
 
     function renderAdmin() {
         const table = document.getElementById('admin-table');
-        const holidays = ["2026-05-05", "2026-05-25"];
+        const holidays = ["2026-05-05","2026-05-25"];
         let h = '<thead><tr><th rowspan="2">멤버</th><th rowspan="2">루틴</th>';
         
         // 날짜 요일 행
