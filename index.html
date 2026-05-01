@@ -4,16 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>미라클 주니 20기 통합센터</title>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         :root { --main: #FF9F43; --ok: #28C76F; --no: #EA5455; --etc: #82868B; --bg: #FFF9F2; --streak: #FF4757; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Apple SD Gothic Neo', sans-serif; background: var(--bg); margin: 0; color: #333; line-height: 1.5; }
         .header { background: #343A40; color: #F1C40F; padding: 12px; text-align: center; font-weight: 800; font-size: 13px; position: sticky; top: 0; z-index: 1000; }
         
-        .quote-area { background: #FFF9E6; border: 3px solid #F1C40F; border-radius: 15px; margin: 15px; padding: 25px 15px; text-align: center; box-shadow: 0 4px 15px rgba(241, 196, 15, 0.2); position: relative; }
-        .quote-text { font-size: 19px; font-weight: 900; color: #5D4037; word-break: keep-all; line-height: 1.6; position: relative; z-index: 1; }
-        .quote-author { font-size: 13px; color: #795548; margin-top: 12px; font-weight: 700; opacity: 0.8; }
+        /* 지능형 누락 알림 스타일 */
+        #missing-alert { background: #FFF4F4; border: 1.5px solid #FFADAD; color: #D63031; margin: 10px 15px 0; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 800; text-align: center; display: none; animation: shake 0.5s; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+        .quote-area { background: #FFF9E6; border: 3px solid #F1C40F; border-radius: 15px; margin: 15px; padding: 25px 15px; text-align: center; box-shadow: 0 4px 15px rgba(241, 196, 15, 0.2); }
+        .quote-text { font-size: 18px; font-weight: 900; color: #5D4037; word-break: keep-all; line-height: 1.4; }
+        .quote-author { font-size: 13px; color: #795548; margin-top: 10px; font-weight: 700; opacity: 0.8; }
 
         .nav { display: flex; gap: 8px; padding: 10px; background: #fff; }
         .nav-item { flex: 1; padding: 12px; text-align: center; font-weight: 800; border-radius: 10px; background: #E9ECEF; color: #495057; border: none; font-size: 13px; cursor: pointer; }
@@ -23,10 +26,10 @@
         .select-box { width: 100%; padding: 15px; font-size: 16px; font-weight: 800; border: 2px solid var(--main); border-radius: 12px; margin-bottom: 15px; background: #fff; }
         
         .card { background: #fff; border-radius: 15px; padding: 20px; margin-bottom: 15px; border: 1px solid #FFE0B2; }
-        .user-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 15px; width: 100%; }
+        .user-header { display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
         .welcome-text { font-size: 20px; font-weight: 900; }
-        .streak-badge { background: #FFF0F0; color: var(--streak); padding: 5px 10px; border-radius: 8px; font-size: 12px; font-weight: 800; flex-grow: 1; text-align: center; }
-        .rule-badge { background: #FFF3E0; color: #E65100; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; border: 1px solid #FFCC80; display: inline-block; margin-bottom: 15px; }
+        .streak-badge { font-size: 14px; font-weight: 800; color: var(--streak); display: flex; align-items: center; gap: 4px; }
+        .date-badge { background: var(--main); color: #fff; padding: 4px 10px; border-radius: 5px; font-size: 12px; display: inline-block; margin-top: 5px; }
         
         .item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f9f9f9; }
         .btn-group { display: flex; gap: 5px; }
@@ -35,38 +38,31 @@
         .btn.X.active { background: var(--no); color: #fff; border-color: var(--no); }
         .btn.P.active { background: var(--etc); color: #fff; border-color: var(--etc); }
         
-        .calendar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-        .user-rate-top { font-size: 13px; font-weight: 900; color: var(--main); text-align: right; }
-
         .grid-container { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-        .day-cell { min-height: 50px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; border: 1px solid #eee; background: #fff; }
-        .day-label { font-size: 9px; margin-top: 2px; opacity: 0.7; }
-        .sat { color: #2980b9; }
-        .sun { color: #e74c3c; }
+        .day-cell { min-height: 55px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; border: 1px solid #eee; background: #fff; cursor: pointer; }
+        .day-cell.selected { border: 2px solid var(--main); }
+        .sun { color: #e74c3c; } .sat { color: #2980b9; }
 
-        .admin-wrapper { overflow: auto; max-height: 70vh; border: 1px solid var(--main); border-radius: 10px; }
-        table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 11px; min-width: 1500px; }
-        th, td { border: 1px solid #FFE0B2; padding: 8px 3px; text-align: center; }
-        thead th { position: sticky; top: 0; background: #FFF8E1; z-index: 10; }
-        .sticky-name { position: sticky; left: 0; background: #FFFDE7 !important; z-index: 20; border-right: 2px solid var(--main); }
-        .admin-editable { cursor: pointer; transition: background 0.2s; font-weight: bold; }
-        .admin-editable:hover { background: #f0f0f0; }
-
-        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 12px 20px; border-radius: 25px; font-size: 13px; display: none; z-index: 3000; }
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(52, 58, 64, 0.95); color: #fff; padding: 15px 25px; border-radius: 15px; font-size: 14px; display: none; z-index: 3000; width: 85%; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.2); animation: fadeInUp 0.3s; word-break: keep-all; font-weight: 700; line-height: 1.4; border-left: 5px solid var(--main); }
+        @keyframes fadeInUp { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translate(-50%, 0); } }
     </style>
     <script src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 <body>
 
-<div class="header" id="topTimer">⏱ 오늘의 기록 마감까지 [ 00:00:00 ]</div>
+<div class="header">⏱ 미라클 주니 20기 루틴 시스템</div>
+
+<!-- [복구] 지능형 누락 알림 영역 -->
+<div id="missing-alert">💡 어제 기록이 보이지 않네요! 사랑주니님께 문의하세요.</div>
+
 <div class="quote-area">
-    <div class="quote-text" id="quote-text">말하기를 멈추고, 행동하기 시작하라.</div>
-    <div class="quote-author" id="quote-author">- 월트 디즈니 -</div>
+    <div class="quote-text" id="quote-text">명언 로딩 중...</div>
+    <div class="quote-author" id="quote-author"></div>
 </div>
 
 <div class="nav">
-    <button class="nav-item active" id="btn-mem" onclick="showTab('member')">🙋‍♂️ 20기 멤버 인증</button>
-    <button class="nav-item" id="btn-adm" onclick="showTab('admin')">👑 관리 대시보드</button>
+    <button class="nav-item active" id="btn-mem" onclick="showTab('member')">🙋‍♂️ 멤버 인증</button>
+    <button class="nav-item" id="btn-adm" onclick="showTab('admin')">👑 관리자 모드</button>
 </div>
 
 <div class="content">
@@ -74,34 +70,26 @@
         <select class="select-box" id="userSelect" onchange="loadUser()">
             <option value="">-- 성함을 선택하세요 --</option>
         </select>
+        
         <div id="userArea" style="display:none;">
             <div class="card">
                 <div class="user-header">
-                    <div class="welcome-text">👋 <span id="span-name"></span>님!</div>
+                    <div class="welcome-text">👋 <span id="span-name"></span>님</div>
                     <div id="streak-area" class="streak-badge"></div>
+                    <div><span id="date-display" class="date-badge"></span></div>
                 </div>
-                <div id="div-rule" class="rule-badge"></div>
                 <div id="routine-list"></div>
             </div>
+
             <div class="card">
-                <div class="calendar-header">
-                    <div style="font-weight:900;">📅 나의 5월 루틴 달력</div>
-                    <div id="user-rate-top" class="user-rate-top">성취율: 0%</div>
-                </div>
+                <div style="font-weight:900; margin-bottom:10px;">📅 5월 루틴 달력 (날짜 클릭 조회)</div>
                 <div id="mini-grid" class="grid-container"></div>
             </div>
         </div>
     </div>
 
     <div id="sec-admin" style="display:none;">
-        <div style="display:flex; gap:10px; margin-bottom:10px;">
-            <button class="nav-item active" style="flex:1;" onclick="downloadAdminImage()">📸 이미지 저장</button>
-            <button class="nav-item" style="flex:1; background:#28C76F; color:white;" onclick="downloadExcel()">📊 엑셀 다운로드</button>
-        </div>
-        <div class="card" id="admin-capture-area" style="padding:10px;">
-            <div style="text-align:center; font-size:16px; font-weight:900; color:var(--main); margin-bottom:10px;">📊 20기 실시간 통합 현황 (셀 클릭 시 수정 가능)</div>
-            <div class="admin-wrapper"><table id="admin-table"></table></div>
-        </div>
+        <div class="card" style="overflow:auto;"><table id="admin-table" style="width:100%; border-collapse:collapse; font-size:11px;"></table></div>
     </div>
 </div>
 
@@ -110,85 +98,116 @@
 <script>
     const API = "https://script.google.com/macros/s/AKfycbztiOVY2kTQqbL0mQ2iyhq_sB_ukO4w_jUGMfqCzP47XnFzGB8_Dv09I0ewFth1M3U4CA/exec";
     const SID = "1naH8MKtag1s1n9EUXy2xL0dlxq9DqZCIKpEkne32tuU";
-    const HOLIDAYS = ['2026-05-05', '2026-05-25'];
-    const WEEKS = ['일','월','화','수','목','금','토'];
     
+    const QUOTES = {
+        1: ["말하기를 멈추고, 행동하기 시작하라.", "월트 디즈니"], 2: ["오늘보다 나은 나를 꿈꿔라.", "미상"], 3: ["포기하지 않는 한, 기적은 일어난다.", "입센"],
+        4: ["승리는 가장 끈기 있는 자에게 돌아간다.", "나폴레옹"], 5: ["습관이 당신을 계속하게 한다.", "짐 론"], 6: ["성공은 작은 노력의 합계이다.", "로버트 콜리어"],
+        7: ["오늘에 전념하라. 그것이 내일의 준비다.", "뉴턴"], 8: ["당신이 믿는 대로 될 것이다.", "헨리 포드"], 9: ["행동은 모든 성공의 기초가 된다.", "피카소"],
+        10: ["가장 큰 영광은 다시 일어나는 데 있다.", "만델라"], 11: ["시작하기에 가장 좋은 때는 바로 지금.", "미상"], 12: ["미래를 만드는 법은 창조하는 것.", "피터 드러커"],
+        13: ["탁월함은 행위가 아니라 습관이다.", "아리스토텔레스"], 14: ["고통은 잠깐이나 후회는 영원하다.", "암스트롱"], 15: ["당신의 꿈을 얕잡는 자를 멀리하라.", "마크 트웨인"],
+        16: ["할 수 있다고 믿으면 능력이 생긴다.", "간디"], 17: ["질문은 당신이 누구인지 말해준다.", "미상"], 18: ["비결은 평범한 일을 비범하게 하는 것.", "록펠러"],
+        19: ["지금 아니면 절대 안 된다는 마음으로.", "미상"], 20: ["길을 아는 것과 걷는 것은 다르다.", "모피어스"], 21: ["천 리 길도 한 걸음부터 시작된다.", "노자"],
+        22: ["꿈꿀 수 있다면 이룰 수도 있다.", "월트 디즈니"], 23: ["목표에서 눈을 돌릴 때 장애물이 보인다.", "헨리 포드"], 24: ["인내하는 자는 무엇이든 얻을 수 있다.", "벤자민 프랭클린"],
+        25: ["모든 성취의 출발점은 갈망이다.", "나폴레옹 힐"], 26: ["기회는 준비된 자에게만 찾아온다.", "파스퇴르"], 27: ["당신은 생각보다 더 용감하고 똑똑하다.", "A.A. 밀른"],
+        28: ["오늘 걷지 않으면 내일은 뛰어야 한다.", "명언"], 29: ["결국 끝까지 하는 것이 실력이다.", "명언"], 30: ["노력을 믿어라. 보상은 반드시 따른다.", "명언"],
+        31: ["당신은 이미 기적의 주인공입니다!", "미라클 주니"]
+    };
+
+    const CHEERS = [
+        "오늘도 수고 많으셨어요. 당신의 밤이 평온하기를 바랄게요. ✨",
+        "작은 실천이 모여 큰 기적을 만듭니다. 지금 정말 잘하고 계세요! 👍",
+        "와우! 당신의 뜨거운 열정이 20기 대시보드를 활활 태우고 있네요! 🔥",
+        "오늘 남긴 이 기록이 훗날 당신이 빛날 증거가 될 거예요. 💎",
+        "혼자라면 힘들었겠지만, '우리'라서 해낼 수 있어요. 끝까지 함께해요!🤝"
+    ];
+
     const MEMBERS = {
-        "사랑주니": { items: ["기상시간 4시", "명상&스트레칭", "글쓰기", "독서", "달리기(걷기)"], note: "운영자 루틴" },
-        "곰돌": { items: ["기상시간 5시", "필사", "새벽기도(독서)", "글쓰기"], note: "주말 기상 자유" },
-        "글터지기": { items: ["기상시간 5시", "독서", "글쓰기", "산책 (주3회)", "취침 10:30분 이전"], note: "일요일 자유" },
-        "꿈젤라": { items: ["기상시간 6시", "양치&긍정확언", "달리기", "독서", "다이어리 쓰기"], note: "일요일 루틴 자유" },
-        "날위한나": { items: ["기상시간 6시30분", "아침필사", "글쓰기", "취침시간 11시 이전"], note: "" },
-        "낭만다정": { items: ["기상시간 6시", "독서(운동or글쓰기)"], note: "주말 루틴 자유" },
-        "들꽃향기": { items: ["글쓰기", "독서", "스트레칭(걷기)", "취침 10:30분 이전"], note: "주말 루틴 자유" },
-        "보름달": { items: ["기상시간 5시20분", "독서", "필사"], note: "주말 루틴 자유" },
-        "비채꿈": { items: ["기상시간 5시30분", "독서", "필사", "경전 읽기", "글쓰기"], note: "주말 루틴 자유" },
-        "사랑초": { items: ["기상시간 6시", "독서", "글쓰기", "걷기(수영)"], note: "주말 루틴 자유" },
-        "써니허니": { items: ["기상시간 6시", "독서", "공부", "스트레칭&명상"], note: "주말 루틴 자유" },
-        "아테네": { items: ["기상시간 6시", "운동", "명상", "독서"], note: "" },
-        "앨리스샘": { items: ["기상시간 4시", "걷기(달리기)", "글쓰기(독서)"], note: "주말 루틴 자유" },
-        "열정부메랑": { items: ["기상시간 4시30분", "운동(헬스)"], note: "주말 루틴 자유" },
-        "열정소피아": { items: ["기상시간 4시", "독서", "새벽기도", "스트레칭"], note: "" },
-        "오빛다": { items: ["기상시간 4시", "영어 공부&리딩", "독서", "필사", "걷기"], note: "주말 루틴 자유" },
-        "오시연": { items: ["기상시간 6시", "스트레칭&간단한 운동"], note: "" },
-        "윤슬": { items: ["기상시간 6시30분", "독서", "글쓰기"], note: "주말 기상 7:30" },
-        "즐거운호호씨": { items: ["기상시간 7시", "필사", "말씀"], note: "주말(연휴) 루틴 자유" },
-        "지금사랑": { items: ["기상시간 6시", "독서", "식단조절"], note: "주말 루틴 자유" },
-        "탈렌트수니": { items: ["기상시간 6시", "걷기(달리기)", "독서", "말씀산책"], note: "" },
-        "하니오웰": { items: ["기상시간 6시", "독서", "글쓰기"], note: "주말 루틴 자유" },
-        "mam 마음": { items: ["기상시간 6시", "글쓰기", "걷기"], note: "" },
-        "bgmsunny": { items: ["기상시간 5시30분", "명상", "스트레칭(요가)"], note: "" }
+        "사랑주니": { items: ["기상시간 4시", "명상&스트레칭", "글쓰기", "독서", "달리기(걷기)"] },
+        "곰돌": { items: ["기상시간 5시", "필사", "새벽기도(독서)", "글쓰기"] },
+        "글터지기": { items: ["기상시간 5시", "독서", "글쓰기", "산책 (주3회)", "취침 10:30분 이전"] },
+        "꿈젤라": { items: ["기상시간 6시", "양치&긍정확언", "달리기", "독서", "다이어리 쓰기"] },
+        "날위한나": { items: ["기상시간 6시30분", "아침필사", "글쓰기", "취침시간 11시 이전"] },
+        "낭만다정": { items: ["기상시간 6시", "독서(운동or글쓰기)"] },
+        "들꽃향기": { items: ["글쓰기", "독서", "스트레칭(걷기)", "취침 10:30분 이전"] },
+        "보름달": { items: ["기상시간 5시20분", "독서", "필사"] },
+        "비채꿈": { items: ["기상시간 5시30분", "독서", "필사", "경전 읽기", "글쓰기"] },
+        "사랑초": { items: ["기상시간 6시", "독서", "글쓰기", "걷기(수영)"] },
+        "써니허니": { items: ["기상시간 6시", "독서", "공부", "스트레칭&명상"] },
+        "아테네": { items: ["기상시간 6시", "운동", "명상", "독서"] },
+        "앨리스샘": { items: ["기상시간 4시", "걷기(달리기)", "글쓰기(독서)"] },
+        "열정부메랑": { items: ["기상시간 4시30분", "운동(헬스)"] },
+        "열정소피아": { items: ["기상시간 4시", "독서", "새벽기도", "스트레칭"] },
+        "오빛다": { items: ["기상시간 4시", "영어 공부&리딩", "독서", "필사", "걷기"] },
+        "오시연": { items: ["기상시간 6시", "스트레칭&간단한 운동"] },
+        "윤슬": { items: ["기상시간 6시30분", "독서", "글쓰기"] },
+        "즐거운호호씨": { items: ["기상시간 7시", "필사", "말씀"] },
+        "지금사랑": { items: ["기상시간 6시", "독서", "식단조절"] },
+        "탈렌트수니": { items: ["기상시간 6시", "걷기(달리기)", "독서", "말씀산책"] },
+        "하니오웰": { items: ["기상시간 6시", "독서", "글쓰기"] },
+        "mam 마음": { items: ["기상시간 6시", "글쓰기", "걷기"] },
+        "bgmsunny": { items: ["기상시간 5시30분", "명상", "스트레칭(요가)"] }
     };
 
     let db = [];
+    let selectedDate = getKSTStr();
+
     function getKST() { return new Date(new Date().getTime() + (9*60*60*1000)); }
     function getKSTStr(d = getKST()) { return d.toISOString().split('T')[0]; }
 
     google.charts.load('current', {packages:['corechart']});
     google.charts.setOnLoadCallback(() => {
         const sel = document.getElementById('userSelect');
-        Object.keys(MEMBERS).forEach(m => sel.add(new Option(m, m)));
+        Object.keys(MEMBERS).sort().forEach(m => sel.add(new Option(m, m)));
+        setQuote();
         fetchData();
-        setInterval(tick, 1000);
     });
+
+    function setQuote() {
+        const day = getKST().getDate();
+        const q = QUOTES[day] || QUOTES[1];
+        document.getElementById('quote-text').innerText = `"${q[0]}"`;
+        document.getElementById('quote-author').innerText = `- ${q[1]} -`;
+    }
 
     function fetchData() {
         const q = new google.visualization.Query(`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&sheet=기록&v=${Date.now()}`);
         q.send(res => {
-            if (res.isError()) return;
             const t = res.getDataTable();
             db = [];
             for (let i = 0; i < t.getNumberOfRows(); i++) {
                 db.push({ date: t.getFormattedValue(i,0), name: t.getValue(i,1), routine: t.getValue(i,2), status: t.getValue(i,3) });
             }
             if(document.getElementById('userSelect').value) loadUser();
-            renderAdmin();
         });
-    }
-
-    function tick() {
-        const n = new Date();
-        const e = new Date(n.getFullYear(), n.getMonth(), n.getDate(), 24, 0, 0);
-        const d = e - n;
-        const h = String(Math.floor(d/3600000)).padStart(2,'0'), m = String(Math.floor((d%3600000)/60000)).padStart(2,'0'), s = String(Math.floor((d%60000)/1000)).padStart(2,'0');
-        document.getElementById('topTimer').innerText = `⏱ 오늘의 기록 마감까지 [ ${h}:${m}:${s} ]`;
     }
 
     function loadUser() {
         const name = document.getElementById('userSelect').value;
         if(!name) return;
-        const todayStr = getKSTStr();
         document.getElementById('userArea').style.display = 'block';
         document.getElementById('span-name').innerText = name;
-        document.getElementById('div-rule').innerText = `📍 개인 수칙: ${MEMBERS[name].note || "없음"}`;
+        document.getElementById('date-display').innerText = `📅 ${selectedDate}`;
         
-        renderUserStats(name);
-        renderGrid(name);
+        // [복구] 지능형 누락 알림 로직
+        const yesterday = new Date(getKST()); yesterday.setDate(yesterday.getDate()-1);
+        const yStr = getKSTStr(yesterday);
+        const hasMissing = MEMBERS[name].items.some(r => getLatestS(name, yStr, r) === '');
+        document.getElementById('missing-alert').style.display = hasMissing ? 'block' : 'none';
+
+        // 스트릭 표시
+        let streak = 0;
+        for(let i=0; i<30; i++) {
+            const d = new Date(getKST()); d.setDate(d.getDate()-i);
+            const ds = getKSTStr(d);
+            if(MEMBERS[name].items.every(r => getLatestS(name, ds, r) === 'O')) streak++; else if(i>0) break;
+        }
+        const streakEl = document.getElementById('streak-area');
+        streakEl.innerHTML = streak >= 7 ? `💎 7일+ 연속 달성! (${streak}일)` : (streak >= 3 ? `🔥 불꽃 유지 중! (${streak}일)` : `🌱 기록을 시작해보세요!`);
 
         const list = document.getElementById('routine-list');
         list.innerHTML = "";
         MEMBERS[name].items.forEach(r => {
-            const s = getS(name, todayStr, r);
+            const s = getLatestS(name, selectedDate, r);
             list.innerHTML += `<div class="item">
                 <div class="item-name">${r}</div>
                 <div class="btn-group">
@@ -198,148 +217,65 @@
                 </div>
             </div>`;
         });
+        renderGrid(name);
     }
 
-    function getS(n, d, r) {
+    function getLatestS(n, d, r) {
         const f = db.filter(x => x.name == n && x.routine == r && x.date.includes(d));
-        return f.length > 0 ? f[f.length-1].status : '대기';
-    }
-
-    function renderUserStats(name) {
-        let totalO = 0, totalX = 0, totalP = 0;
-        for(let i=1; i<=31; i++) {
-            const dS = `2026-05-${String(i).padStart(2,'0')}`;
-            MEMBERS[name].items.forEach(r => {
-                const s = getS(name, dS, r);
-                if(s === 'O') totalO++; else if(s === 'X') totalX++; else if(s === '-') totalP++;
-            });
-        }
-        const valid = totalO + totalX;
-        const rate = valid === 0 ? 0 : Math.round((totalO / valid) * 100);
-        document.getElementById('user-rate-top').innerHTML = `전체 성취율: ${rate}%<br><span style="font-size:10px; color:#888;">(패스 ${totalP}회 제외)</span>`;
-        
-        let streak = 0, check = getKST();
-        while(true) {
-            const dS = getKSTStr(check);
-            if(!dS.includes('-05-')) break;
-            if(MEMBERS[name].items.every(r => getS(name, dS, r) === 'O')) { streak++; check.setDate(check.getDate()-1); }
-            else break;
-        }
-        document.getElementById('streak-area').innerText = streak > 0 ? `🔥 ${streak}일 연속 성공!` : `🌱 오늘부터 시작!`;
+        return f.length > 0 ? f[f.length-1].status : '';
     }
 
     function renderGrid(name) {
         const grid = document.getElementById('mini-grid'); grid.innerHTML = "";
         for(let i=1; i<=31; i++) {
-            const dS = `2026-05-${String(i).padStart(2,'0')}`, dObj = new Date(2026, 4, i);
-            const w = WEEKS[dObj.getDay()];
-            let dO = 0, dX = 0, dP = 0;
-            MEMBERS[name].items.forEach(r => { 
-                const s = getS(name, dS, r); 
-                if(s === 'O') dO++; else if(s === 'X') dX++; else if(s === '-') dP++; 
-            });
-            let color = '#fff';
-            if(dO+dX+dP > 0) color = (dX === 0 && dO > 0) ? '#28C76F' : '#F1C40F';
-            const isSun = dObj.getDay() === 0 || HOLIDAYS.includes(dS);
-            grid.innerHTML += `<div class="day-cell ${isSun?'sun':(dObj.getDay()===6?'sat':'')}" style="background:${color}">
-                ${i} <span class="day-label">(${w})</span>
-            </div>`;
+            const ds = `2026-05-${String(i).padStart(2,'0')}`, dObj = new Date(2026, 4, i);
+            let dO = 0; MEMBERS[name].items.forEach(r => { if(getLatestS(name, ds, r)==='O') dO++; });
+            let bg = dO > 0 ? (dO === MEMBERS[name].items.length ? '#D1FADF' : '#FEF0C7') : '#fff';
+            const isSel = selectedDate === ds ? 'selected' : '';
+            grid.innerHTML += `<div class="day-cell ${isSel} ${dObj.getDay()===0?'sun':(dObj.getDay()===6?'sat':'')}" style="background:${bg}" onclick="changeDate('${ds}')">${i}</div>`;
         }
     }
 
-    async function save(name, routine, status, date = getKSTStr()) {
-        db = db.filter(x => !(x.date.includes(date) && x.name === name && x.routine === routine));
-        db.push({ date, name, routine, status });
-        
+    function changeDate(d) { selectedDate = d; loadUser(); }
+
+    async function save(name, routine, status) {
+        db.push({ date: selectedDate, name, routine, status });
         loadUser();
-        renderAdmin();
+        const msg = CHEERS[Math.floor(Math.random() * CHEERS.length)];
+        showToast(msg);
+        fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ date: selectedDate, name, routine, status }) });
+    }
 
+    function showToast(msg) {
         const t = document.getElementById('toast');
-        t.innerText = "데이터가 반영되었습니다! ✨"; 
-        t.style.display = 'block';
-        setTimeout(()=>t.style.display='none', 1200);
-
-        fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ date, name, routine, status }) });
-    }
-
-    // 관리자 순환 수정 함수
-    function cycleStatus(name, date, routine, current) {
-        const map = { '대기': 'O', 'O': 'X', 'X': '-', '-': '대기' };
-        save(name, routine, map[current] || 'O', date);
-    }
-
-    function renderAdmin() {
-        const table = document.getElementById('admin-table');
-        let h = '<thead><tr><th class="sticky-name" rowspan="2">멤버</th><th rowspan="2">루틴</th>';
-        for(let i=1; i<=31; i++) {
-            const dObj = new Date(2026, 4, i);
-            const w = WEEKS[dObj.getDay()];
-            const isSun = dObj.getDay() === 0 || HOLIDAYS.includes(`2026-05-${String(i).padStart(2,'0')}`);
-            h += `<th class="${isSun?'sun':(dObj.getDay()===6?'sat':'')}">${i}<br>(${w})</th>`;
-        }
-        h += '<th rowspan="2">성취율</th></tr></thead><tbody>';
-
-        Object.keys(MEMBERS).forEach(name => {
-            let tO = 0, tX = 0;
-            MEMBERS[name].items.forEach((r, idx) => {
-                h += `<tr>`;
-                if(idx===0) h += `<td class="sticky-name" rowspan="${MEMBERS[name].items.length}">${name}</td>`;
-                h += `<td style="text-align:left; padding-left:5px;">${r}</td>`;
-                for(let i=1; i<=31; i++) {
-                    const dS = `2026-05-${String(i).padStart(2,'0')}`;
-                    const s = getS(name, dS, r);
-                    if(s==='O') tO++; else if(s==='X') tX++;
-                    const color = s==='O'?'#28C76F':(s==='X'?'#EA5455':(s==='-'?'#888':'#ccc'));
-                    h += `<td class="admin-editable" style="color:${color}" onclick="cycleStatus('${name}','${dS}','${r}','${s}')">${s==='대기'?'·':(s==='-'?'P':s)}</td>`;
-                }
-                if(idx===0) h += `<td rowspan="${MEMBERS[name].items.length}" id="adm-rate-${name}">0%</td>`;
-                h += `</tr>`;
-            });
-            setTimeout(() => {
-                const el = document.getElementById(`adm-rate-${name}`);
-                if(el) el.innerText = (tO+tX === 0 ? 0 : Math.round(tO/(tO+tX)*100)) + '%';
-            }, 100);
-        });
-        table.innerHTML = h + '</tbody>';
+        t.innerText = msg; t.style.display = 'block';
+        setTimeout(() => t.style.display = 'none', 2500);
     }
 
     function showTab(m) {
-        if(m === 'admin' && prompt("관리자 비밀번호") !== "4120") return;
+        if(m === 'admin' && prompt("비번") !== "4120") return;
         document.getElementById('sec-member').style.display = m==='member'?'block':'none';
         document.getElementById('sec-admin').style.display = m==='admin'?'block':'none';
         document.getElementById('btn-mem').classList.toggle('active', m==='member');
         document.getElementById('btn-adm').classList.toggle('active', m==='admin');
-    }
-    
-    function downloadAdminImage() {
-        html2canvas(document.getElementById('admin-capture-area'), { scale: 2 }).then(canvas => {
-            const a = document.createElement('a'); a.download = `미라클주니_통합현황.png`;
-            a.href = canvas.toDataURL(); a.click();
-        });
+        if(m === 'admin') renderAdmin();
     }
 
-    function downloadExcel() {
-        let csv = "\uFEFF멤버,루틴,";
-        for(let i=1; i<=31; i++) csv += `${i}일,`;
-        csv += "성취율\n";
-        Object.keys(MEMBERS).forEach(name => {
-            let tO = 0, tX = 0;
-            MEMBERS[name].items.forEach((r, idx) => {
-                csv += `${name},${r},`;
-                for(let i=1; i<=31; i++) {
-                    const s = getS(name, `2026-05-${String(i).padStart(2,'0')}`, r);
-                    csv += `${s==='대기'?'':s},`;
-                    if(s==='O') tO++; else if(s==='X') tX++;
-                }
-                if(idx === 0) csv += `${tO+tX===0?0:Math.round(tO/(tO+tX)*100)}%`;
-                csv += "\n";
-            });
+    function renderAdmin() {
+        const table = document.getElementById('admin-table');
+        let h = '<tr><th>이름</th>';
+        for(let i=1; i<=31; i++) h += `<th>${i}</th>`;
+        h += '</tr>';
+        Object.keys(MEMBERS).sort().forEach(n => {
+            h += `<tr><td>${n}</td>`;
+            for(let i=1; i<=31; i++) {
+                const ds = `2026-05-${String(i).padStart(2,'0')}`;
+                let dO = 0; MEMBERS[n].items.forEach(r => { if(getLatestS(n, ds, r)==='O') dO++; });
+                h += `<td>${dO === MEMBERS[n].items.length ? '✅' : ''}</td>`;
+            }
+            h += '</tr>';
         });
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "미라클주니_통합현황.csv";
-        link.click();
+        table.innerHTML = h;
     }
 </script>
 </body>
