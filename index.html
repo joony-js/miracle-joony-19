@@ -304,19 +304,27 @@
                 if(s==='X') hasX = true;
             });
             
-            // 색상 로직 복구
-            let bg = '#fff'; // 기본 흰색
-            if (hasEntry) {
-                if (hasX) {
-                    bg = '#FEF0C7'; // X가 있으면 노란색
-                } else if (dO > 0 && dP > 0) {
-                    bg = '#FEF0C7'; // O와 패스가 섞여 있으면 노란색
-                } else if (dO > 0 && dP === 0) {
-                    bg = '#D1FADF'; // 모두 O이면 초록색
-                } else if (dO === 0 && dP > 0) {
-                    bg = '#F2F4F7'; // 모두 패스이면 회색
-                }
-            }
+            // 색상 로직 수정 (전부 X일 때 빨간색 추가)
+let bg = '#fff'; 
+if (hasEntry) {
+    // 1. 모든 항목이 X인 경우 (루틴 개수와 X의 개수가 같을 때)
+    const totalItems = MEMBERS[name].items.length;
+    const dX = totalItems - (dO + dP); // 미입력을 제외한 나머지가 X인 상황 체크용 (hasX 활용 가능)
+    
+    // 실제 입력된 값 중 X의 개수를 정확히 파악하기 위해 아래 로직으로 적용하세요.
+    let xCount = 0;
+    MEMBERS[name].items.forEach(r => { if(getLatestS(name, ds, r) === 'X') xCount++; });
+
+    if (xCount === totalItems) {
+        bg = '#FEE4E2'; // 전부 X인 경우 연한 빨간색
+    } else if (hasX || (dO > 0 && dP > 0)) {
+        bg = '#FEF0C7'; // X가 섞여있거나 O/패스 혼합이면 노란색
+    } else if (dO > 0 && dP === 0) {
+        bg = '#D1FADF'; // 모두 O이면 초록색
+    } else if (dO === 0 && dP > 0) {
+        bg = '#F2F4F7'; // 모두 패스이면 회색
+    }
+}
 
             grid.innerHTML += `<div class="day-cell ${isSun?'sun':''} ${isSat?'sat':''} ${isHol?'holiday':''} ${selectedDate===ds?'selected':''}" 
                 style="background:${bg}" onclick="openDayModal('${name}','${ds}')">${i}(${dayName})${isHol?'<br><span style="font-size:8px">휴일</span>':''}</div>`;
