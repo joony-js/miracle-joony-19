@@ -190,6 +190,7 @@
     ];
 
     let db = [];
+    // 메인 입력 날짜는 항상 오늘로 고정
     let selectedDate = new Date().toLocaleDateString('sv-SE'); 
 
     google.charts.load('current', {packages:['corechart']});
@@ -237,7 +238,7 @@
         document.getElementById('span-name').innerText = name;
         document.getElementById('personal-note').innerText = `📌 ${name}님의 개인 수칙: ${MEMBERS[name].note || "주말 루틴 자유입니다."}`;
 
-        // 상단 알림 로직 (어제 미입력 + 누적 횟수)
+        // 상단 알림 로직
         const todayStr = new Date().toLocaleDateString('sv-SE');
         let missingCount = 0;
         let isYestMissing = false;
@@ -261,8 +262,8 @@
         if(isYestMissing) {
             alertDiv.style.display = 'block';
             alertDiv.innerText = missingCount > 1 
-                ? `💡 어제 기록이 없습니다! (누락된 기록 총 ${missingCount}회) 사랑주니님께 문의하세요.`
-                : `💡 어제 기록이 없습니다! 사랑주니님께 문의하세요.`;
+                ? `💡 어제 기록이 입력되지 않았습니다! (누락된 기록 총 ${missingCount}회) 사랑주니님께 문의하세요.`
+                : `💡 어제 기록이 입력되지 않았습니다! 사랑주니님께 문의하세요.`;
         } else {
             alertDiv.style.display = 'none';
         }
@@ -280,23 +281,21 @@
             const hasP = dayStatus.some(s => s === '-');
             const hasNone = dayStatus.every(s => s === '');
 
-            // 성공/재충전/재시작 로직 판단
             if(!hasNone) {
                 if (hasO) {
-                    streak++; // O가 하나라도 있으면 성공 (O+X, O+P 모두 포함)
+                    streak++;
                     if(ds === todayStr) finalMessage = `🔥 연속 ${streak}일 달성 중! 오늘도 힘차게!`;
                 } else if (hasP && !hasX) {
-                    streak++; // 전부 패스인 경우 기록은 인정 (재충전)
+                    streak++;
                     if(ds === todayStr) finalMessage = `☕ 오늘은 재충전의 날!`;
                 } else {
-                    streak = 0; // X가 포함되고 O가 없는 경우 (X만 있거나 X+P)
+                    streak = 0;
                     if(ds === todayStr) finalMessage = `🌱 괜찮아요! 다시 1일을 만들어요!`;
                 }
             } else if (ds < todayStr) {
-                streak = 0; // 과거 미입력시 스트릭 끊김
+                streak = 0;
             }
             
-            // 통계용
             if(ds <= todayStr) {
                 items.forEach(r => {
                     const s = getLatestS(name, ds, r);
@@ -314,6 +313,7 @@
         const list = document.getElementById('routine-list');
         list.innerHTML = "";
         items.forEach(r => {
+            // 메인 화면의 버튼 상태는 항상 selectedDate(오늘)의 상태를 보여줌
             const s = getLatestS(name, selectedDate, r);
             list.innerHTML += `<div class="item"><span>${r}</span><div class="btn-group">
                 <button class="btn O ${s==='O'?'active':''}" onclick="save('${name}','${r}','O')">O</button>
@@ -348,13 +348,13 @@
             if (hasEntry) {
                 const totalItems = MEMBERS[name].items.length;
                 if (xCount === totalItems) {
-                    bg = '#FEE4E2'; // 전부 X
+                    bg = '#FEE4E2';
                 } else if (xCount > 0 || (dO > 0 && dP > 0)) {
-                    bg = '#FEF0C7'; // 혼합
+                    bg = '#FEF0C7';
                 } else if (dO > 0 && dP === 0) {
-                    bg = '#D1FADF'; // 올 O
+                    bg = '#D1FADF';
                 } else if (dO === 0 && dP > 0) {
-                    bg = '#F2F4F7'; // 올 패스
+                    bg = '#F2F4F7';
                 }
             }
 
@@ -446,12 +446,12 @@
         setTimeout(fetchData, 1500); 
     }
 
+    // 수정된 부분: selectedDate를 건드리지 않고 모달 전용 로직 수행
     function openDayModal(name, date) {
-        selectedDate = date;
-        loadUser();
         const modal = document.getElementById('dayModal');
         const mDate = document.getElementById('modalDate');
         const mBody = document.getElementById('modalBody');
+        
         mDate.innerText = `📅 ${date} 기록 상세`;
         let html = "";
         MEMBERS[name].items.forEach(r => {
