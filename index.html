@@ -3,57 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>미라클 주니 20기 통합센터</title>
+    <title>미라클 주니 통합센터</title>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root { --main: #FF9F43; --ok: #28C76F; --no: #EA5455; --etc: #82868B; --bg: #FFF9F2; --streak: #FF4757; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Apple SD Gothic Neo', sans-serif; background: var(--bg); margin: 0; color: #333; line-height: 1.5; }
-        .header { background: #343A40; color: #F1C40F; padding: 12px; text-align: center; font-weight: 800; font-size: 13px; position: sticky; top: 0; z-index: 1000; }
+        body { font-family: 'Apple SD Gothic Neo', sans-serif; background: var(--bg); margin: 0; color: #333; }
         
-        /* 지능형 누락 알림 스타일 */
-        #missing-alert { background: #FFF4F4; border: 1.5px solid #FFADAD; color: #D63031; margin: 10px 15px 0; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 800; text-align: center; display: none; animation: shake 0.5s; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .header { background: #343A40; color: #F1C40F; padding: 12px; text-align: center; font-weight: 800; font-size: 13px; position: sticky; top: 0; z-index: 1000; }
+        #missing-alert { background: #FFF4F4; border: 1.5px solid #FFADAD; color: #D63031; margin: 10px 15px 0; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 800; text-align: center; display: none; }
 
-        .quote-area { background: #FFF9E6; border: 3px solid #F1C40F; border-radius: 15px; margin: 15px; padding: 25px 15px; text-align: center; box-shadow: 0 4px 15px rgba(241, 196, 15, 0.2); }
-        .quote-text { font-size: 18px; font-weight: 900; color: #5D4037; word-break: keep-all; line-height: 1.4; }
-        .quote-author { font-size: 13px; color: #795548; margin-top: 10px; font-weight: 700; opacity: 0.8; }
+        .quote-area { background: #FFF9E6; border: 3px solid #F1C40F; border-radius: 15px; margin: 15px; padding: 25px 15px; text-align: center; }
+        .quote-text { font-size: 18px; font-weight: 900; color: #5D4037; word-break: keep-all; }
+        .quote-author { font-size: 13px; color: #795548; margin-top: 10px; font-weight: 700; }
 
         .nav { display: flex; gap: 8px; padding: 10px; background: #fff; }
-        .nav-item { flex: 1; padding: 12px; text-align: center; font-weight: 800; border-radius: 10px; background: #E9ECEF; color: #495057; border: none; font-size: 13px; cursor: pointer; }
-        .nav-item.active { background: var(--main); color: #fff; box-shadow: 0 4px 10px rgba(255,159,67,0.3); }
+        .nav-item { flex: 1; padding: 12px; text-align: center; font-weight: 800; border-radius: 10px; background: #E9ECEF; color: #495057; border: none; font-size: 13px; }
+        .nav-item.active { background: var(--main); color: #fff; }
         
-        .content { padding: 15px; padding-bottom: 60px; }
-        .select-box { width: 100%; padding: 15px; font-size: 16px; font-weight: 800; border: 2px solid var(--main); border-radius: 12px; margin-bottom: 15px; background: #fff; }
+        .content { padding: 15px; }
+        .select-box { width: 100%; padding: 15px; font-size: 16px; font-weight: 800; border: 2px solid var(--main); border-radius: 12px; margin-bottom: 10px; }
         
-        .card { background: #fff; border-radius: 15px; padding: 20px; margin-bottom: 15px; border: 1px solid #FFE0B2; }
-        .user-header { display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
-        .welcome-text { font-size: 20px; font-weight: 900; }
-        .streak-badge { font-size: 14px; font-weight: 800; color: var(--streak); display: flex; align-items: center; gap: 4px; }
-        .date-badge { background: var(--main); color: #fff; padding: 4px 10px; border-radius: 5px; font-size: 12px; display: inline-block; margin-top: 5px; }
-        
-        .item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f9f9f9; }
-        .btn-group { display: flex; gap: 5px; }
-        .btn { width: 42px; height: 42px; border-radius: 8px; border: 1px solid #eee; font-weight: 900; background: #fff; color: #ccc; cursor: pointer; }
+        .user-info-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .welcome-text { font-size: 19px; font-weight: 900; }
+        .streak-area { font-size: 14px; font-weight: 800; color: var(--streak); }
+
+        .stat-row { background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; font-weight: 700; display: flex; justify-content: space-around; border: 1px solid #eee; }
+
+        .card { background: #fff; border-radius: 15px; padding: 15px; margin-bottom: 15px; border: 1px solid #FFE0B2; }
+        .item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f9f9f9; }
+        .btn-group { display: flex; gap: 4px; }
+        .btn { width: 40px; height: 40px; border-radius: 8px; border: 1px solid #eee; font-weight: 900; background: #fff; color: #ccc; }
         .btn.O.active { background: var(--ok); color: #fff; border-color: var(--ok); }
         .btn.X.active { background: var(--no); color: #fff; border-color: var(--no); }
         .btn.P.active { background: var(--etc); color: #fff; border-color: var(--etc); }
-        
-        .grid-container { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-        .day-cell { min-height: 55px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; border: 1px solid #eee; background: #fff; cursor: pointer; }
-        .day-cell.selected { border: 2px solid var(--main); }
-        .sun { color: #e74c3c; } .sat { color: #2980b9; }
 
-        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(52, 58, 64, 0.95); color: #fff; padding: 15px 25px; border-radius: 15px; font-size: 14px; display: none; z-index: 3000; width: 85%; text-align: center; box-shadow: 0 5px 20px rgba(0,0,0,0.2); animation: fadeInUp 0.3s; word-break: keep-all; font-weight: 700; line-height: 1.4; border-left: 5px solid var(--main); }
-        @keyframes fadeInUp { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+        .grid-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; font-weight: 800; margin-bottom: 5px; }
+        .grid-container { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        .day-cell { height: 50px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; border: 1px solid #eee; background: #fff; position: relative; }
+        .day-cell.sun { color: #e74c3c; background: #fff5f5; }
+        .day-cell.sat { color: #2980b9; background: #f0f7ff; }
+        .day-cell.holiday { color: #e74c3c; }
+        .day-cell.selected { border: 2.5px solid var(--main); z-index: 10; }
+
+        .admin-controls { display: flex; gap: 10px; margin-bottom: 15px; }
+        .admin-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; font-weight: 800; color: #fff; font-size: 12px; cursor: pointer; }
+        .btn-cap { background: #6c5ce7; }
+        .btn-xls { background: #27ae60; }
+        #admin-table { width: 100%; border-collapse: collapse; font-size: 10px; text-align: center; border: 1px solid #ddd; }
+        #admin-table th, #admin-table td { border: 1px solid #eee; padding: 6px 2px; }
+        #admin-table th { background: #f8f9fa; }
+
+        .footer-note { font-size: 12px; color: #888; text-align: center; margin-top: 10px; font-weight: 700; line-height: 1.4; }
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 13px; display: none; z-index: 2000; font-weight: 700; width: 80%; text-align: center; }
     </style>
-    <script src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 <body>
 
-<div class="header">⏱ 미라클 주니 20기 루틴 시스템</div>
-
-<!-- [복구] 지능형 누락 알림 영역 -->
-<div id="missing-alert">💡 어제 기록이 보이지 않네요! 사랑주니님께 문의하세요.</div>
+<div class="header">⏱ 미라클 주니 통합센터</div>
+<div id="missing-alert">💡 어제 기록이 입력되지 않았습니다! 사랑주니님께 문의하세요.</div>
 
 <div class="quote-area">
     <div class="quote-text" id="quote-text">명언 로딩 중...</div>
@@ -61,35 +71,47 @@
 </div>
 
 <div class="nav">
-    <button class="nav-item active" id="btn-mem" onclick="showTab('member')">🙋‍♂️ 멤버 인증</button>
-    <button class="nav-item" id="btn-adm" onclick="showTab('admin')">👑 관리자 모드</button>
+    <button id="nav-mem" class="nav-item active" onclick="showTab('member')">🙋‍♂️ 멤버 인증</button>
+    <button id="nav-adm" class="nav-item" onclick="showTab('admin')">👑 관리자 모드</button>
 </div>
 
 <div class="content">
     <div id="sec-member">
-        <select class="select-box" id="userSelect" onchange="loadUser()">
-            <option value="">-- 성함을 선택하세요 --</option>
-        </select>
+        <select class="select-box" id="userSelect" onchange="loadUser()"><option value="">-- 성함을 선택하세요 --</option></select>
         
         <div id="userArea" style="display:none;">
             <div class="card">
-                <div class="user-header">
+                <div class="user-info-row">
                     <div class="welcome-text">👋 <span id="span-name"></span>님</div>
-                    <div id="streak-area" class="streak-badge"></div>
-                    <div><span id="date-display" class="date-badge"></span></div>
+                    <div id="streak-area" class="streak-area"></div>
+                </div>
+                <div class="stat-row">
+                    <span>🔥 성취율: <span id="stat-rate">0</span>%</span>
+                    <span>🔘 패스: <span id="stat-pass">0</span>회</span>
                 </div>
                 <div id="routine-list"></div>
+                <div class="footer-note">📢 주말/공휴일은 자유 루틴입니다.<br>기록하지 않아도 스트릭이 유지됩니다.</div>
             </div>
 
             <div class="card">
-                <div style="font-weight:900; margin-bottom:10px;">📅 5월 루틴 달력 (날짜 클릭 조회)</div>
+                <div style="font-weight:900; margin-bottom:10px;">📅 5월 루틴 달력(날짜 클릭 시 기록 조회)</div>
+                <div class="grid-header">
+                    <div style="color:#e74c3c">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div style="color:#2980b9">토</div>
+                </div>
                 <div id="mini-grid" class="grid-container"></div>
             </div>
         </div>
     </div>
 
     <div id="sec-admin" style="display:none;">
-        <div class="card" style="overflow:auto;"><table id="admin-table" style="width:100%; border-collapse:collapse; font-size:11px;"></table></div>
+        <h3 id="admin-title" style="margin:0 0 10px 0; font-weight:900;">📊 20기 전체 통합현황</h3>
+        <div class="admin-controls">
+            <button class="admin-btn btn-cap" onclick="capture()">🖼 화면 캡처</button>
+            <button class="admin-btn btn-xls" onclick="exportXls()">📈 엑셀 저장</button>
+        </div>
+        <div class="card" id="capture-area" style="overflow:auto; padding:10px;">
+            <table id="admin-table"></table>
+        </div>
     </div>
 </div>
 
@@ -99,28 +121,6 @@
     const API = "https://script.google.com/macros/s/AKfycbztiOVY2kTQqbL0mQ2iyhq_sB_ukO4w_jUGMfqCzP47XnFzGB8_Dv09I0ewFth1M3U4CA/exec";
     const SID = "1naH8MKtag1s1n9EUXy2xL0dlxq9DqZCIKpEkne32tuU";
     
-    const QUOTES = {
-        1: ["말하기를 멈추고, 행동하기 시작하라.", "월트 디즈니"], 2: ["오늘보다 나은 나를 꿈꿔라.", "미상"], 3: ["포기하지 않는 한, 기적은 일어난다.", "입센"],
-        4: ["승리는 가장 끈기 있는 자에게 돌아간다.", "나폴레옹"], 5: ["습관이 당신을 계속하게 한다.", "짐 론"], 6: ["성공은 작은 노력의 합계이다.", "로버트 콜리어"],
-        7: ["오늘에 전념하라. 그것이 내일의 준비다.", "뉴턴"], 8: ["당신이 믿는 대로 될 것이다.", "헨리 포드"], 9: ["행동은 모든 성공의 기초가 된다.", "피카소"],
-        10: ["가장 큰 영광은 다시 일어나는 데 있다.", "만델라"], 11: ["시작하기에 가장 좋은 때는 바로 지금.", "미상"], 12: ["미래를 만드는 법은 창조하는 것.", "피터 드러커"],
-        13: ["탁월함은 행위가 아니라 습관이다.", "아리스토텔레스"], 14: ["고통은 잠깐이나 후회는 영원하다.", "암스트롱"], 15: ["당신의 꿈을 얕잡는 자를 멀리하라.", "마크 트웨인"],
-        16: ["할 수 있다고 믿으면 능력이 생긴다.", "간디"], 17: ["질문은 당신이 누구인지 말해준다.", "미상"], 18: ["비결은 평범한 일을 비범하게 하는 것.", "록펠러"],
-        19: ["지금 아니면 절대 안 된다는 마음으로.", "미상"], 20: ["길을 아는 것과 걷는 것은 다르다.", "모피어스"], 21: ["천 리 길도 한 걸음부터 시작된다.", "노자"],
-        22: ["꿈꿀 수 있다면 이룰 수도 있다.", "월트 디즈니"], 23: ["목표에서 눈을 돌릴 때 장애물이 보인다.", "헨리 포드"], 24: ["인내하는 자는 무엇이든 얻을 수 있다.", "벤자민 프랭클린"],
-        25: ["모든 성취의 출발점은 갈망이다.", "나폴레옹 힐"], 26: ["기회는 준비된 자에게만 찾아온다.", "파스퇴르"], 27: ["당신은 생각보다 더 용감하고 똑똑하다.", "A.A. 밀른"],
-        28: ["오늘 걷지 않으면 내일은 뛰어야 한다.", "명언"], 29: ["결국 끝까지 하는 것이 실력이다.", "명언"], 30: ["노력을 믿어라. 보상은 반드시 따른다.", "명언"],
-        31: ["당신은 이미 기적의 주인공입니다!", "미라클 주니"]
-    };
-
-    const CHEERS = [
-        "오늘도 수고 많으셨어요. 당신의 밤이 평온하기를 바랄게요. ✨",
-        "작은 실천이 모여 큰 기적을 만듭니다. 지금 정말 잘하고 계세요! 👍",
-        "와우! 당신의 뜨거운 열정이 20기 대시보드를 활활 태우고 있네요! 🔥",
-        "오늘 남긴 이 기록이 훗날 당신이 빛날 증거가 될 거예요. 💎",
-        "혼자라면 힘들었겠지만, '우리'라서 해낼 수 있어요. 끝까지 함께해요!🤝"
-    ];
-
     const MEMBERS = {
         "사랑주니": { items: ["기상시간 4시", "명상&스트레칭", "글쓰기", "독서", "달리기(걷기)"] },
         "곰돌": { items: ["기상시간 5시", "필사", "새벽기도(독서)", "글쓰기"] },
@@ -146,7 +146,31 @@
         "하니오웰": { items: ["기상시간 6시", "독서", "글쓰기"] },
         "mam 마음": { items: ["기상시간 6시", "글쓰기", "걷기"] },
         "bgmsunny": { items: ["기상시간 5시30분", "명상", "스트레칭(요가)"] }
+       
     };
+
+    const QUOTES = {
+        1: ["말하기를 멈추고, 행동하기 시작하라.", "월트 디즈니"], 2: ["오늘보다 나은 나를 꿈꿔라.", "공자"], 3: ["포기하지 않는 한, 기적은 일어난다.", "입센"],
+        4: ["승리는 가장 끈기 있는 자에게 돌아간다.", "나폴레옹"], 5: ["습관이 당신을 계속하게 한다.", "짐 론"], 6: ["매일매일이 새로운 기회다.", "에피쿠로스"],
+        7: ["가장 큰 위험은 위험을 감수하지 않는 것이다.", "마크 저커버그"], 8: ["계획 없는 목표는 단지 꿈에 불과하다.", "생텍쥐페리"], 9: ["성공은 열정을 잃지 않고 실패를 거듭하는 능력이다.", "윈스턴 처칠"],
+        10: ["미래를 예측하는 가장 좋은 방법은 미래를 창조하는 것이다.", "피터 드러커"], 11: ["오늘 할 수 있는 일에 전력을 다하라.", "뉴턴"], 12: ["행동은 모든 성공의 기초가 된다.", "피카소"],
+        13: ["탁월함은 행위가 아니라 습관이다.", "아리스토텔레스"], 14: ["자신감은 위대한 일의 첫 번째 비결이다.", "사무엘 존슨"], 15: ["끝까지 해보기 전까지는 늘 불가능해 보인다.", "넬슨 만델라"],
+        16: ["기회는 준비된 자에게만 찾아온다.", "루이 파스퇴르"], 17: ["한 번의 실패가 영원한 실패는 아니다.", "F. 스콧 피츠제럴드"], 18: ["삶이 있는 한 희망은 있다.", "키케로"],
+        19: ["당신의 가치는 당신의 행동으로 결정된다.", "간디"], 20: ["어제보다 더 나은 내일을 만들어라.", "미상"], 21: ["가장 빛나는 별은 가장 어두운 밤에 뜬다.", "미상"],
+        22: ["시작이 반이다.", "아리스토텔레스"], 23: ["작은 일에 충실한 것이 위대한 일로 가는 길이다.", "마더 테레사"], 24: ["열정 없이 이루어진 위대한 일은 없다.", "랄프 왈도 에머슨"],
+        25: ["성공은 매일 반복되는 작은 노력의 합계이다.", "로버트 콜리어"], 26: ["당신이 할 수 있다고 믿든 할 수 없다고 믿든 믿는 대로 될 것이다.", "헨리 포드"], 27: ["시간은 우리가 가진 가장 소중한 자산이다.", "테오프라스트"],
+        28: ["꿈을 기록하는 순간, 목표가 된다.", "미상"], 29: ["인내는 쓰지만 그 열매는 달다.", "루소"], 30: ["지금 이 순간이 당신의 인생을 결정한다.", "미상"],
+        31: ["당신은 이미 기적의 주인공입니다!", "미라클 주니"]
+    };
+
+    // 수정된 응원 문구
+    const CHEERS = [
+        "소중한 기록 감사합니다. 당신의 오늘이 반짝이는 순간들로 가득하길 바라요. ✨",
+        "작은 실천이 모여 큰 기적을 만듭니다. 지금 정말 잘하고 계세요! 👍",
+        "와우! 당신의 뜨거운 열정이 20기 대시보드를 활활 태우고 있네요! 🔥",
+        "오늘 남긴 이 기록이 훗날 당신이 빛날 증거가 될 거예요. 💎",
+        "혼자라면 힘들었겠지만, '우리'라서 해낼 수 있어요. 끝까지 함께해요!🤝"
+    ];
 
     let db = [];
     let selectedDate = getKSTStr();
@@ -157,14 +181,19 @@
     google.charts.load('current', {packages:['corechart']});
     google.charts.setOnLoadCallback(() => {
         const sel = document.getElementById('userSelect');
-        Object.keys(MEMBERS).sort().forEach(m => sel.add(new Option(m, m)));
+        const sorted = Object.keys(MEMBERS).sort((a,b) => {
+            if(a === "사랑주니") return -1;
+            if(b === "사랑주니") return 1;
+            return a.localeCompare(b, 'ko');
+        });
+        sorted.forEach(m => sel.add(new Option(m, m)));
         setQuote();
         fetchData();
     });
 
     function setQuote() {
-        const day = getKST().getDate();
-        const q = QUOTES[day] || QUOTES[1];
+        const d = getKST().getDate();
+        const q = QUOTES[d] || QUOTES[1];
         document.getElementById('quote-text').innerText = `"${q[0]}"`;
         document.getElementById('quote-author').innerText = `- ${q[1]} -`;
     }
@@ -178,7 +207,13 @@
                 db.push({ date: t.getFormattedValue(i,0), name: t.getValue(i,1), routine: t.getValue(i,2), status: t.getValue(i,3) });
             }
             if(document.getElementById('userSelect').value) loadUser();
+            renderAdmin();
         });
+    }
+
+    function getLatestS(name, date, routine) {
+        const rows = db.filter(r => r.name === name && r.date === date && r.routine === routine);
+        return rows.length ? rows[rows.length-1].status : '';
     }
 
     function loadUser() {
@@ -186,53 +221,58 @@
         if(!name) return;
         document.getElementById('userArea').style.display = 'block';
         document.getElementById('span-name').innerText = name;
-        document.getElementById('date-display').innerText = `📅 ${selectedDate}`;
-        
-        // [복구] 지능형 누락 알림 로직
+
         const yesterday = new Date(getKST()); yesterday.setDate(yesterday.getDate()-1);
         const yStr = getKSTStr(yesterday);
-        const hasMissing = MEMBERS[name].items.some(r => getLatestS(name, yStr, r) === '');
-        document.getElementById('missing-alert').style.display = hasMissing ? 'block' : 'none';
+        const isMay = yStr.includes("-05-");
+        const missing = isMay && MEMBERS[name].items.some(r => getLatestS(name, yStr, r) === '');
+        document.getElementById('missing-alert').style.display = missing ? 'block' : 'none';
 
-        // 스트릭 표시
-        let streak = 0;
-        for(let i=0; i<30; i++) {
-            const d = new Date(getKST()); d.setDate(d.getDate()-i);
-            const ds = getKSTStr(d);
-            if(MEMBERS[name].items.every(r => getLatestS(name, ds, r) === 'O')) streak++; else if(i>0) break;
+        let streak = 0, totalO = 0, totalP = 0, totalItems = 0;
+        const items = MEMBERS[name].items;
+        const todayStr = getKSTStr();
+
+        for(let i=0; i<31; i++) {
+            const ds = `2026-05-${String(i+1).padStart(2,'0')}`;
+            const dayOk = items.every(r => getLatestS(name, ds, r) === 'O');
+            if(dayOk) streak++; else if(ds < todayStr) streak = 0;
+            
+            items.forEach(r => {
+                const s = getLatestS(name, ds, r);
+                if(s==='O') totalO++; if(s==='-') totalP++;
+                if(ds <= todayStr) totalItems++;
+            });
         }
-        const streakEl = document.getElementById('streak-area');
-        streakEl.innerHTML = streak >= 7 ? `💎 7일+ 연속 달성! (${streak}일)` : (streak >= 3 ? `🔥 불꽃 유지 중! (${streak}일)` : `🌱 기록을 시작해보세요!`);
+        
+        document.getElementById('streak-area').innerHTML = streak > 0 ? `🔥 연속 ${streak}일 달성!` : "🌱 기록을 시작해보세요";
+        document.getElementById('stat-rate').innerText = totalItems ? Math.round((totalO / totalItems) * 100) : 0;
+        document.getElementById('stat-pass').innerText = totalP;
 
         const list = document.getElementById('routine-list');
         list.innerHTML = "";
-        MEMBERS[name].items.forEach(r => {
+        items.forEach(r => {
             const s = getLatestS(name, selectedDate, r);
-            list.innerHTML += `<div class="item">
-                <div class="item-name">${r}</div>
-                <div class="btn-group">
-                    <button class="btn O ${s==='O'?'active':''}" onclick="save('${name}','${r}','O')">O</button>
-                    <button class="btn X ${s==='X'?'active':''}" onclick="save('${name}','${r}','X')">X</button>
-                    <button class="btn P ${s==='-'?'active':''}" onclick="save('${name}','${r}','-')">-</button>
-                </div>
-            </div>`;
+            list.innerHTML += `<div class="item"><span>${r}</span><div class="btn-group">
+                <button class="btn O ${s==='O'?'active':''}" onclick="save('${name}','${r}','O')">O</button>
+                <button class="btn X ${s==='X'?'active':''}" onclick="save('${name}','${r}','X')">X</button>
+                <button class="btn P ${s==='-'?'active':''}" onclick="save('${name}','${r}','-')">-</button>
+            </div></div>`;
         });
         renderGrid(name);
     }
 
-    function getLatestS(n, d, r) {
-        const f = db.filter(x => x.name == n && x.routine == r && x.date.includes(d));
-        return f.length > 0 ? f[f.length-1].status : '';
-    }
-
     function renderGrid(name) {
         const grid = document.getElementById('mini-grid'); grid.innerHTML = "";
+        const holidays = ["2026-05-05", "2026-05-24", "2026-05-25"];
         for(let i=1; i<=31; i++) {
-            const ds = `2026-05-${String(i).padStart(2,'0')}`, dObj = new Date(2026, 4, i);
+            const d = new Date(2026, 4, i);
+            const ds = getKSTStr(d);
+            const isSun = d.getDay() === 0, isSat = d.getDay() === 6, isHol = holidays.includes(ds);
             let dO = 0; MEMBERS[name].items.forEach(r => { if(getLatestS(name, ds, r)==='O') dO++; });
-            let bg = dO > 0 ? (dO === MEMBERS[name].items.length ? '#D1FADF' : '#FEF0C7') : '#fff';
-            const isSel = selectedDate === ds ? 'selected' : '';
-            grid.innerHTML += `<div class="day-cell ${isSel} ${dObj.getDay()===0?'sun':(dObj.getDay()===6?'sat':'')}" style="background:${bg}" onclick="changeDate('${ds}')">${i}</div>`;
+            let bg = dO === MEMBERS[name].items.length && dO > 0 ? '#D1FADF' : (dO > 0 ? '#FEF0C7' : '#fff');
+            
+            grid.innerHTML += `<div class="day-cell ${isSun?'sun':''} ${isSat?'sat':''} ${isHol?'holiday':''} ${selectedDate===ds?'selected':''}" 
+                style="background:${bg}" onclick="changeDate('${ds}')">${i}${isHol?'<span style="font-size:8px">휴일</span>':''}</div>`;
         }
     }
 
@@ -241,41 +281,54 @@
     async function save(name, routine, status) {
         db.push({ date: selectedDate, name, routine, status });
         loadUser();
-        const msg = CHEERS[Math.floor(Math.random() * CHEERS.length)];
-        showToast(msg);
+        showToast(CHEERS[Math.floor(Math.random()*CHEERS.length)]);
         fetch(API, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ date: selectedDate, name, routine, status }) });
     }
 
-    function showToast(msg) {
-        const t = document.getElementById('toast');
-        t.innerText = msg; t.style.display = 'block';
-        setTimeout(() => t.style.display = 'none', 2500);
+    function showToast(m) {
+        const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block';
+        setTimeout(()=>t.style.display='none', 3000);
     }
 
     function showTab(m) {
-        if(m === 'admin' && prompt("비번") !== "4120") return;
+        if(m === 'admin' && prompt("비밀번호") !== "4120") return;
         document.getElementById('sec-member').style.display = m==='member'?'block':'none';
         document.getElementById('sec-admin').style.display = m==='admin'?'block':'none';
-        document.getElementById('btn-mem').classList.toggle('active', m==='member');
-        document.getElementById('btn-adm').classList.toggle('active', m==='admin');
-        if(m === 'admin') renderAdmin();
+        document.getElementById('nav-mem').className = 'nav-item ' + (m==='member'?'active':'');
+        document.getElementById('nav-adm').className = 'nav-item ' + (m==='admin'?'active':'');
     }
 
     function renderAdmin() {
         const table = document.getElementById('admin-table');
-        let h = '<tr><th>이름</th>';
+        let h = '<tr><th>멤버</th>';
         for(let i=1; i<=31; i++) h += `<th>${i}</th>`;
-        h += '</tr>';
-        Object.keys(MEMBERS).sort().forEach(n => {
-            h += `<tr><td>${n}</td>`;
+        h += '<th>%</th></tr>';
+        
+        Object.keys(MEMBERS).sort((a,b) => (a==="사랑주니"?-1:b==="사랑주니"?1:a.localeCompare(b,'ko'))).forEach(n => {
+            h += `<tr><td style="font-weight:bold">${n}</td>`;
+            let okDays = 0;
             for(let i=1; i<=31; i++) {
                 const ds = `2026-05-${String(i).padStart(2,'0')}`;
-                let dO = 0; MEMBERS[n].items.forEach(r => { if(getLatestS(n, ds, r)==='O') dO++; });
-                h += `<td>${dO === MEMBERS[n].items.length ? '✅' : ''}</td>`;
+                const allOk = MEMBERS[n].items.every(r => getLatestS(n, ds, r) === 'O');
+                if(allOk) { h += '<td style="background:#d1fadf">✅</td>'; okDays++; }
+                else h += '<td></td>';
             }
-            h += '</tr>';
+            h += `<td style="font-weight:bold">${Math.round((okDays/31)*100)}</td></tr>`;
         });
         table.innerHTML = h;
+    }
+
+    function capture() {
+        html2canvas(document.querySelector("#capture-area")).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `미라클주니_20기_현황_${getKSTStr()}.png`;
+            link.href = canvas.toDataURL(); link.click();
+        });
+    }
+
+    function exportXls() {
+        const wb = XLSX.utils.table_to_book(document.getElementById('admin-table'));
+        XLSX.writeFile(wb, `미라클주니_20기_기록_${getKSTStr()}.xlsx`);
     }
 </script>
 </body>
