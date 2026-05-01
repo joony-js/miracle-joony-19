@@ -57,7 +57,7 @@
         #admin-table th { background: #fff9f2; padding: 8px 2px; }
         
         /* 관리자 모드 멤버간 진한 구분선 */
-        .member-divider { border-top: 3px solid #333 !important; }
+        .member-divider { border-top: 1px solid #555 !important; }
         
         .clickable-cell { cursor: pointer; }
         .clickable-cell:hover { background: #f0f0f0 !important; }
@@ -306,7 +306,7 @@
             if(hasX) bg = '#FEE4E2';
 
             grid.innerHTML += `<div class="day-cell ${isSun?'sun':''} ${isSat?'sat':''} ${isHol?'holiday':''} ${selectedDate===ds?'selected':''}" 
-                style="background:${bg}" onclick="openDayModal('${name}','${ds}')">${i}일(${dayName})${isHol?'<br><span style="font-size:8px">휴일</span>':''}</div>`;
+                style="background:${bg}" onclick="openDayModal('${name}','${ds}')">${i}(${dayName})${isHol?'<br><span style="font-size:8px">휴일</span>':''}</div>`;
         }
     }
 
