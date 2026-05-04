@@ -81,7 +81,7 @@
 <div class="quote-area">
     <div class="quote-text" id="quote-text">명언 로딩 중...</div>
     <div class="quote-author" id="quote-author"></div>
-    <div class="current-date" id="today-display"></div>
+    <div class="current-date" id="display-date"></div>
 </div>
 
 <div class="nav">
@@ -201,8 +201,20 @@
             if(b === "사랑주니") return 1;
             return a.localeCompare(b, 'ko');
         });
+// 1. 멤버 목록 생성 (중복 삭제됨)
         sorted.forEach(m => sel.add(new Option(m, m)));
-        setQuote();
+        
+        // 2. 명언 설정
+        setQuote(); 
+        
+        // 3. 화면에 오늘 날짜 표시 (자동 갱신 로직)
+        const now = new Date();
+        const dateOptions = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' };
+        let dateStr = now.toLocaleDateString('ko-KR', dateOptions);
+        dateStr = dateStr.replace(/([가-힣])$/, "($1)"); // 요일에 괄호 추가
+        document.getElementById('display-date').innerText = dateStr;
+
+        // 4. 데이터 가져오기 (한 번만 호출)
         fetchData();
     });
 
