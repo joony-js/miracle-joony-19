@@ -167,6 +167,14 @@
         "mam 마음": { items: ["기상시간 6시", "글쓰기", "걷기"], note: "없음" }
     };
 
+     새로운 루틴이 추가될 때마다 여기에 추가하세요.
+
+const PERSONAL_ROUTINE_CONFIG = {
+       "탈렌트수니": {
+        "영어공부": "2026-05-07"
+    }
+};
+
     const QUOTES = {
         1: ["말하기를 멈추고, 행동하기 시작하라.", "월트 디즈니"], 2: ["오늘보다 나은 나를 꿈꿔라.", "공자"], 3: ["포기하지 않는 한, 기적은 일어난다.", "입센"],
         4: ["승리는 가장 끈기 있는 자에게 돌아간다.", "나폴레옹"], 5: ["습관이 당신을 계속하게 한다.", "짐 론"], 6: ["매일매일이 새로운 기회다.", "에피쿠로스"],
@@ -238,10 +246,24 @@
         });
     }
 
-    function getLatestS(name, date, routine) {
-        const rows = db.filter(r => r.name === name && r.date === date && r.routine === routine);
-        return rows.length ? rows[rows.length-1].status : '';
+ function getLatestS(name, date, routine) {
+    const rows = db.filter(r => r.name === name && r.date === date && r.routine === routine);
+    
+    // 1. 실제 입력 데이터가 있다면 그 값을 사용
+    if (rows.length) return rows[rows.length - 1].status;
+
+    // 2. 해당 멤버의 개인 설정이 있는지 확인
+    if (PERSONAL_ROUTINE_CONFIG[name] && PERSONAL_ROUTINE_CONFIG[name][routine]) {
+        const startDate = PERSONAL_ROUTINE_CONFIG[name][routine];
+        
+        // 날짜가 시작일보다 이전이라면 특수 신호 반환
+        if (date < startDate) {
+            return 'BEFORE_START';
+        }
     }
+
+    return ''; // 실제 미기입 상태
+}
 
     function loadUser() {
         const name = document.getElementById('userSelect').value;
@@ -375,69 +397,92 @@
         }
     }
 
-    function renderAdmin() {
-        const table = document.getElementById('admin-table');
-        const holidays = ["2026-05-05","2026-05-25"];
-        let h = '<thead><tr><th rowspan="2">멤버/수칙</th><th rowspan="2">루틴</th>';
-        
-        for(let i=1; i<=31; i++) {
-            const d = new Date(2026, 4, i);
-            const ds = d.toLocaleDateString('sv-SE');
-            const dayNames = ['일','월','화','수','목','금','토'];
-            const dayName = dayNames[d.getDay()];
-            let cls = "";
-            if(d.getDay()===0 || holidays.includes(ds)) cls = "sun-txt";
-            else if(d.getDay()===6) cls = "sat-txt";
-            h += `<th class="${cls}">${i}<br>(${dayName})</th>`;
-        }
-        h += '<th rowspan="2">성취</th></tr></thead><tbody>';
-
-        const sortedNames = Object.keys(MEMBERS).sort((a,b) => (a==="사랑주니"?-1:b==="사랑주니"?1:a.localeCompare(b,'ko')));
-        
-        sortedNames.forEach((n, memberIdx) => {
-            const items = MEMBERS[n].items;
-            const dividerClass = memberIdx > 0 ? 'member-divider' : ''; 
-            
-            items.forEach((r, idx) => {
-                h += `<tr>`;
-                if(idx === 0) {
-                    h += `<td rowspan="${items.length}" class="${dividerClass}" style="font-weight:bold; background:#fffcf5; width:80px;">
-                            ${n}<br><span style="font-size:8px; color:#888; font-weight:normal;">[${MEMBERS[n].note || '자유'}]</span>
-                          </td>`;
-                }
-                h += `<td class="${idx===0?dividerClass:''}" style="text-align:left; padding-left:5px; background:#fffcf5; font-size:9px;">${r}</td>`;
-                
-                for(let i=1; i<=31; i++) {
-                    const ds = `2026-05-${String(i).padStart(2,'0')}`;
-                    const s = getLatestS(n, ds, r);
-                    let displayS = s === '-' ? '패스' : s; 
-                    let bgColor = "";
-                    if(s==='O') { bgColor = "#d1fadf"; }
-                    else if(s==='X') { bgColor = "#ffe4e2"; }
-                    else if(s==='-') { bgColor = "#f2f4f7"; }
-                    
-                    h += `<td class="clickable-cell ${idx===0?dividerClass:''}" style="background:${bgColor}" onclick="quickSave('${n}','${r}','${ds}','${s}')">${displayS}</td>`;
-                }
-                
-                if(idx === 0) {
-                    let memberO = 0, memberV = 0;
-                    items.forEach(it => {
-                        for(let i=1; i<=31; i++){
-                            const dss = `2026-05-${String(i).padStart(2,'0')}`;
-                            const st = getLatestS(n, dss, it);
-                            if(st==='O') memberO++;
-                            if(st === 'O' || st === 'X') memberV++; 
-                        }
-                    });
-                    const rate = memberV ? Math.round((memberO / memberV) * 100) : 0;
-                    h += `<td rowspan="${items.length}" class="${dividerClass}" style="font-weight:bold; font-size:11px; background:#fffcf5;">${rate}%</td>`;
-                }
-                h += `</tr>`;
-            });
-        });
-        h += '</tbody>';
-        table.innerHTML = h;
+  function renderAdmin() {
+    const table = document.getElementById('admin-table');
+    const holidays = ["2026-05-05", "2026-05-25"];
+    let h = '<thead><tr><th rowspan="2">멤버/수칙</th><th rowspan="2">루틴</th>';
+    
+    // 날짜 헤더 생성
+    for(let i=1; i<=31; i++) {
+        const d = new Date(2026, 4, i);
+        const ds = d.toLocaleDateString('sv-SE');
+        const dayNames = ['일','월','화','수','목','금','토'];
+        const dayName = dayNames[d.getDay()];
+        let cls = "";
+        if(d.getDay()===0 || holidays.includes(ds)) cls = "sun-txt";
+        else if(d.getDay()===6) cls = "sat-txt";
+        h += `<th class="${cls}">${i}<br>(${dayName})</th>`;
     }
+    h += '<th rowspan="2">성취</th></tr></thead><tbody>';
+
+    // 멤버별 행 생성
+    const sortedNames = Object.keys(MEMBERS); 
+    sortedNames.forEach((n, memberIdx) => {
+        const items = MEMBERS[n].items;
+        const dividerClass = memberIdx > 0 ? 'member-divider' : ''; 
+        
+        items.forEach((r, idx) => {
+            h += `<tr>`;
+            if(idx === 0) {
+                h += `<td rowspan="${items.length}" class="${dividerClass}" style="font-weight:bold; background:#fffcf5; width:80px;">
+                        ${n}<br><span style="font-size:8px; color:#888; font-weight:normal;">[${MEMBERS[n].note || '자유'}]</span>
+                      </td>`;
+            }
+            h += `<td class="${idx===0?dividerClass:''}" style="text-align:left; padding-left:5px; background:#fffcf5; font-size:9px;">${r}</td>`;
+            
+            // 각 날짜별 셀 생성
+            for(let i=1; i<=31; i++) {
+                const ds = `2026-05-${String(i).padStart(2,'0')}`;
+                const s = getLatestS(n, ds, r); // 여기서 BEFORE_START를 받아옴
+                
+                let displayS = s;
+                let bgColor = "";
+                let clickEvent = `quickSave('${n}','${r}','${ds}','${s}')`;
+
+                // [핵심 로직] 시작 전 루틴 처리
+                if (s === 'BEFORE_START') {
+                    displayS = "시작 전";
+                    bgColor = "#f9f9f9"; // 연한 회색
+                    clickEvent = "";    // 클릭 불가
+                } else if (s === 'O') {
+                    bgColor = "#d1fadf";
+                } else if (s === 'X') {
+                    bgColor = "#ffe4e2";
+                } else if (s === '-') {
+                    displayS = "패스";
+                    bgColor = "#f2f4f7";
+                }
+
+                h += `<td class="clickable-cell ${idx===0?dividerClass:''}" 
+                          style="background:${bgColor}" 
+                          onclick="${clickEvent}">${displayS || ''}</td>`;
+            }
+            
+            // 행의 마지막에 성취율 계산 (첫 번째 루틴 줄에만 표시)
+            if(idx === 0) {
+                let memberO = 0, memberV = 0;
+                items.forEach(it => {
+                    for(let i=1; i<=31; i++){
+                        const dss = `2026-05-${String(i).padStart(2,'0')}`;
+                        const st = getLatestS(n, dss, it);
+                        
+                        // [핵심 로직] 시작 전 데이터는 계산에서 아예 제외
+                        if (st === 'BEFORE_START') continue;
+                        
+                        if(st === 'O') memberO++;
+                        if(st === 'O' || st === 'X') memberV++; 
+                    }
+                });
+                const rate = memberV ? Math.round((memberO / memberV) * 100) : 0;
+                h += `<td rowspan="${items.length}" class="${dividerClass}" style="font-weight:bold; font-size:11px; background:#fffcf5;">${rate}%</td>`;
+            }
+            h += `</tr>`;
+        });
+    });
+    
+    h += '</tbody>';
+    table.innerHTML = h;
+}
 
     async function quickSave(name, routine, date, currentStatus) {
         let next = 'O';
