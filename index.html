@@ -48,7 +48,8 @@
         #missing-alert { background:#fff8e1;border:1.5px solid var(--gold);color:#7a5800;margin:10px 14px 0;padding:11px;border-radius:12px;font-size:13px;font-weight:800;text-align:center;display:none; }
 
         /* QUOTE — ⑩ 네이비 배경 → 골드 테두리 + 크림 배경 (20기 스타일) */
-        .quote-area { background:var(--gold-light);border:2.5px solid var(--gold);border-radius:var(--radius);margin:13px 14px 0;padding:20px 18px;text-align:center;position:relative;z-index:1;overflow:hidden; }
+        /* ① position:relative/z-index:1 제거 — nav 터치 차단 방지 */
+        .quote-area { background:var(--gold-light);border:2.5px solid var(--gold);border-radius:var(--radius);margin:13px 14px 0;padding:20px 18px;text-align:center;overflow:hidden; }
         .quote-area::before,.quote-area::after { content:'✦';position:absolute;font-size:13px;color:rgba(44,62,107,0.2); }
         .quote-area::before { top:10px;left:14px; }
         .quote-area::after  { bottom:10px;right:14px; }
@@ -57,7 +58,8 @@
         .current-date { font-size:14px;color:var(--text-sub);margin-top:5px;font-weight:600; }
 
         /* NAV */
-        .nav { display:flex;gap:0;padding:10px 14px 0;background:var(--cream);position:sticky;top:68px;z-index:901; }
+        /* ② nav top은 JS에서 동적 계산 (initUI에서 설정) */
+        .nav { display:flex;gap:0;padding:10px 14px 0;background:var(--cream);position:sticky;z-index:901; }
         .nav-item { flex:1;padding:12px 4px;text-align:center;font-weight:800;border-radius:10px 10px 0 0;background:var(--cream2);color:#aaa;border:none;font-size:12px;cursor:pointer;border-bottom:3px solid transparent;transition:all 0.2s; }
         .nav-item.active { background:var(--card);color:var(--navy);border-bottom:3px solid var(--gold); }
 
@@ -652,6 +654,13 @@ function loadFallbackQuotes(){
 // 초기화
 // ============================================================
 function initUI(){
+    // ② nav top을 헤더 실제 높이로 동적 설정 (CSS top 고정값 대신)
+    const headerEl = document.querySelector('.header');
+    const navEl    = document.querySelector('.nav');
+    if(headerEl && navEl){
+        navEl.style.top = headerEl.offsetHeight + 'px';
+    }
+
     const sel=document.getElementById('userSelect');
     sel.innerHTML='<option value="">-- 성함을 선택하세요 --</option>';
     Object.keys(MEMBERS).sort((a,b)=>a==="사랑주니"?-1:b==="사랑주니"?1:a.localeCompare(b,'ko'))
@@ -783,7 +792,10 @@ function updateMyRank(name){
     const pos=rateData.findIndex(d=>d.name===name)+1;
     const total=rateData.length;
     const rankLine=document.getElementById('my-rank-line');
-    if(pos>0){
+    const myRate=rateData.find(d=>d.name===name)?.rate??0;
+    const allZero=rateData.every(d=>d.rate===0);
+    // ③ 본인 rate===0 이거나 전체가 0이면 숨김
+    if(pos>0 && myRate>0 && !allZero){
         rankLine.style.display='block';
         document.getElementById('rank-pos').innerText=pos;
         document.getElementById('rank-total').innerText=total;
