@@ -761,10 +761,10 @@ function updateMyRank(name){
         return {name:n,rate:(o+x)>0?Math.round(o/(o+x)*100):0};
     }).sort((a,b)=>b.rate-a.rate);
     // ② 동점 처리: 나보다 rate 높은 사람 수 + 1 = 공동 순위
+    const myRate=rateData.find(d=>d.name===name)?.rate??0;
     const pos=rateData.filter(d=>d.rate>myRate).length+1;
     const total=rateData.length;
     const rankLine=document.getElementById('my-rank-line');
-    const myRate=rateData.find(d=>d.name===name)?.rate??0;
     const allZero=rateData.every(d=>d.rate===0);
     // ③ 본인 rate===0 이거나 전체가 0이면 숨김
     if(pos>0 && myRate>0 && !allZero){
@@ -1081,11 +1081,12 @@ function renderRoutineList(name){
 async function save(name,routine,status){
     db=db.filter(r=>!(r.name===name&&r.date===selectedDate&&r.routine===routine));
     if(status!=='') db.push({date:selectedDate,name,routine,status});
-    loadUser(); renderTodaySummary();
+    // ① 토스트·컨페티·fetch를 loadUser 앞으로 이동
     if(status==='O'){ showConfetti(); showToast(randItem(O_CHEERS)); }
     else if(status==='⭐'){ showConfetti(); showToast("⭐ 자유일에도 실천! 대단해요!"); }
     else { showToast(randItem(SAVE_CHEERS)); }
     fetch(API,{method:'POST',mode:'no-cors',body:JSON.stringify({date:selectedDate,name,routine,status})});
+    loadUser(); renderTodaySummary();
     // 저장 후 1.5초 뒤 서버 동기화 (중복 fetchRecords 제거 — loadAllData와 별도)
     // ② 1.5초 뒤 서버 동기화 — loadUser 제거로 autoSaveFreeDay 중복 방지
     // ② 저장 후 1.5초 동기화 — loadUser + 달력 갱신 포함
