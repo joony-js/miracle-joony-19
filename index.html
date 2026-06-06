@@ -41,7 +41,7 @@
         .loading-stars { font-size:20px;margin-bottom:14px;letter-spacing:5px;color:var(--gold); }
 
         /* HEADER */
-        .header { background:var(--navy-dark);color:var(--gold);padding:13px 16px;text-align:center;font-weight:900;font-size:15px;position:sticky;top:0;z-index:1000;letter-spacing:1.5px;border-bottom:1.5px solid rgba(241,196,15,0.22); }
+        .header { background:var(--navy-dark);color:var(--gold);padding:13px 16px;text-align:center;font-weight:900;font-size:15px;position:relative;letter-spacing:1.5px;border-bottom:1.5px solid rgba(241,196,15,0.22); } /* 2. sticky 제거 */
         .header-sub { font-size:11px;color:rgba(241,196,15,0.55);font-weight:600;margin-top:2px;letter-spacing:0; }
         /* 3. 자정 카운트다운 */
         .header-countdown { font-size:11px;color:rgba(255,255,255,0.7);font-weight:700;margin-top:3px;letter-spacing:0; }
@@ -146,9 +146,9 @@
 
         /* BADGES */
         .badge-grid { display:flex;flex-wrap:wrap;gap:9px; }
-        .badge { display:flex;flex-direction:column;align-items:center;background:var(--cream2);border:1.5px solid var(--border);border-radius:14px;padding:8px 5px;text-align:center;flex:1;min-width:55px;max-width:72px; }
+        .badge { display:flex;flex-direction:column;align-items:center;background:var(--cream2);border:1.5px solid var(--border);border-radius:14px;padding:8px 5px;text-align:center;flex:1;min-width:44px;max-width:58px; }
         .badge.earned { background:var(--navy);border-color:var(--gold);box-shadow:0 0 12px rgba(241,196,15,0.32); }
-        .badge-icon  { font-size:18px;margin-bottom:2px; }
+        .badge-icon  { font-size:14px;margin-bottom:2px; }
         .badge-label { font-size:10px;font-weight:900;color:var(--text); }
         .badge.earned .badge-label { color:var(--gold); }
         .badge-cond  { font-size:9px;color:var(--text-sub);margin-top:3px;line-height:1.3; }
@@ -163,7 +163,7 @@
         .btn-xls { background:linear-gradient(135deg,#1a6a40,#27ae60); }
         #admin-table { width:100%;border-collapse:collapse;font-size:11px;text-align:center;background:#fff; }
         #admin-table th,#admin-table td { border:1px solid #e4dfcc;padding:5px 2px;min-width:26px; }
-        #admin-table th { background:var(--cream2);padding:8px 2px;font-size:10px;color:var(--navy);font-weight:900; }
+        #admin-table th { background:var(--cream2);padding:8px 2px;font-size:10px;color:var(--navy);font-weight:900;position:sticky;top:0;z-index:10; } /* 3. 날짜 행 고정 */
         .member-divider { border-top:2px solid var(--navy)!important; }
         .clickable-cell { cursor:pointer; }
         .clickable-cell:hover { background:var(--gold-light)!important; }
@@ -237,10 +237,19 @@
 <!-- 7. 헤더 미기록 알림 제거 — missing-alert display:none -->
 <div id="missing-alert"></div>
 
-<div class="quote-area">
-    <div class="quote-text" id="quote-text">명언 로딩 중...</div>
-    <div class="quote-author" id="quote-author"></div>
-    <div class="current-date" id="display-date"></div>
+<div class="quote-area" id="quote-area-wrap">
+    <div id="quote-content">
+        <div class="quote-text" id="quote-text">명언 로딩 중...</div>
+        <div class="quote-author" id="quote-author"></div>
+        <div class="current-date" id="display-date"></div>
+    </div>
+    <!-- 3. 접기/펼치기 버튼 -->
+    <div style="text-align:right;margin-top:8px;">
+        <button id="quote-toggle-btn" onclick="toggleQuote()"
+            style="background:none;border:none;color:var(--gold-dim);font-size:12px;font-weight:700;cursor:pointer;padding:2px 6px;">
+            ▲ 접기
+        </button>
+    </div>
 </div>
 
 <div class="nav">
@@ -288,7 +297,7 @@
                 <div id="praise-text" class="praise-text" style="display:none;"></div>
                 <div id="routine-list"></div>
                 <div id="personal-note" class="personal-note" style="margin-top:12px;margin-bottom:0;"></div>
-                <div class="footer-note">📢 자유일에도 실천하면 ⭐로 기록해 주세요!</div>
+                <div class="footer-note" id="footer-note-text">📢 자유일에도 실천하면 ⭐로 기록해 주세요!</div>
             </div>
 
             <div class="card" id="home-badge-card" style="display:none;">
@@ -332,14 +341,7 @@
     <!-- ADMIN -->
     <div id="sec-admin" style="display:none;">
         <h3 style="margin:0 0 12px 0;font-weight:900;color:var(--navy);text-align:center;font-size:15px;">📊 21기 실시간 통합 현황</h3>
-        <div class="pw-change-box">
-            <div class="pw-change-title">🔑 앱 비밀번호 변경</div>
-            <div class="pw-change-row">
-                <input class="pw-change-input" id="pw-new-input" type="password" placeholder="새 비밀번호 입력">
-                <button class="pw-change-btn" onclick="changeAppPw()">변경</button>
-            </div>
-            <div id="pw-change-msg" style="font-size:12px;font-weight:800;margin-top:8px;color:var(--text-sub);"></div>
-        </div>
+        <!-- 비밀번호 변경 기능 제거 — 깃허브 APP_PASSWORD 상수로 변경 -->
         <div class="month-toggle" style="margin-bottom:12px;">
             <button class="month-btn" id="adm-btn-may" onclick="setAdminMonth(5)">5월 기록</button>
             <button class="month-btn active" id="adm-btn-jun" onclick="setAdminMonth(6)">6월 기록</button>
@@ -349,7 +351,7 @@
             <button class="admin-btn btn-xls" onclick="exportXls()">📈 엑셀 저장</button>
         </div>
         <div id="absence-alert" style="margin-bottom:12px;"></div>
-        <div class="card" id="capture-area" style="overflow:auto;padding:10px;border:2px solid var(--navy);">
+        <div class="card" id="capture-area" style="overflow:auto;padding:10px;border:2px solid var(--navy);max-height:70vh;">
             <table id="admin-table"></table>
         </div>
         <div style="font-size:11px;color:var(--text-sub);margin-top:8px;text-align:center;">셀 클릭 시 상태 수정 | 🔥잘함 ⚠️보통 🆘주의 💤미기록</div>
@@ -403,7 +405,13 @@ const WEEK_RANGES = {
     5:[ {label:"1주",start:1,end:7},{label:"2주",start:8,end:14},{label:"3주",start:15,end:21},{label:"4주",start:22,end:28},{label:"5주",start:29,end:31} ]
 };
 
-const PARTIAL_FREE_ROUTINES = { "곰돌": ["기상시간 5시"] };
+// 부분 자유일 — 특정 루틴만 자유 처리
+// 곰돌: 주말 기상시간만 자유
+// 날위한나: 금/토 취침시간만 자유
+const PARTIAL_FREE_ROUTINES = {
+    "곰돌":    { days:[0,6],   routines:["기상시간 5시"] },
+    "날위한나": { days:[5,6],   routines:["취침시간 11시 이전"] }
+};
 
 const BADGE_STREAK = [
     { icon:'🌱', label:'새싹',  days:3,  cond:'3일 연속 기록'  },
@@ -420,7 +428,7 @@ let db=[], db5=[], MEMBERS={}, QUOTES={};
 let selectedDate=getTodayStr(), currentUser="", adminAuthed=false;
 let viewingPrevMonth=false, calMonth=6, adminMonth=6;
 let autoSaveDate={};
-let appPassword="";
+// appPassword 변수 제거 — APP_PASSWORD 상수 사용
 
 // ============================================================
 // 유틸
@@ -459,20 +467,7 @@ function showPwOverlay(){
     setTimeout(()=>document.getElementById('pw-input').focus(), 300);
 }
 
-async function changeAppPw(){
-    const newPw = document.getElementById('pw-new-input').value.trim();
-    const msgEl = document.getElementById('pw-change-msg');
-    if(!newPw){ msgEl.style.color='var(--no)'; msgEl.innerText='새 비밀번호를 입력해 주세요.'; return; }
-    msgEl.style.color='var(--text-sub)'; msgEl.innerText='변경 중...';
-    try {
-        await fetch(API, { method:'POST', mode:'no-cors', body:JSON.stringify({ type:'setting', key:'app_password', value:newPw }) });
-        appPassword = newPw;
-        localStorage.setItem('mj_pw_auth', Date.now().toString());
-        document.getElementById('pw-new-input').value = '';
-        msgEl.style.color='var(--ok)'; msgEl.innerText='✅ 변경 완료!';
-        setTimeout(()=>{ msgEl.innerText=''; }, 3000);
-    } catch(e){ msgEl.style.color='var(--no)'; msgEl.innerText='변경 실패. 다시 시도해 주세요.'; }
-}
+// changeAppPw 제거 — 비밀번호는 깃허브 APP_PASSWORD 상수로 변경
 
 // ============================================================
 // 1. 로딩 — type=all 단일 호출
@@ -482,45 +477,75 @@ function fetchWithTimeout(url, ms){
     return Promise.race([fetch(url).then(r=>r.json()), timeout]).catch(()=>({ result:"error" }));
 }
 
+// GAS 데이터 로딩 공통 함수
+async function fetchAllData(timeout=5000){
+    const allRes = await fetchWithTimeout(API+"?type=all&v="+Date.now(), timeout);
+    if(allRes.result==="success"){
+        if(allRes.members) MEMBERS = allRes.members;
+        if(allRes.quotes)  QUOTES  = allRes.quotes;
+        if(Array.isArray(allRes.records)) db = allRes.records;
+        return true;
+    } else {
+        // type=all 미지원 시 개별 호출 fallback
+        const [mRes, qRes] = await Promise.all([
+            fetchWithTimeout(API+"?type=members&v="+Date.now(), 4000),
+            fetchWithTimeout(API+"?type=quotes&v="+Date.now(), 4000)
+        ]);
+        if(mRes.result==="success") MEMBERS = mRes.members;
+        if(qRes.result==="success") QUOTES  = qRes.quotes;
+        await fetchWithTimeout(API+"?type=records&v="+Date.now(), timeout)
+            .then(d=>{ if(d.result==="success"&&Array.isArray(d.records)) db=d.records; })
+            .catch(()=>{});
+        return Object.keys(MEMBERS).length > 0;
+    }
+}
+
 async function loadAllData(){
     showLoading(true);
-    // 2. 로딩 중 select 비활성화 (브라우저 호환성 문제 방지)
+    // 로딩 중 select 비활성화 (브라우저 호환성 문제 방지)
     const selEl = document.getElementById('userSelect');
     if(selEl) selEl.disabled = true;
 
-    // 2. 비밀번호 내장 — GAS settings 호출 제거
+    // 비밀번호 인증 처리
     if(isPwAuthed()){
         document.getElementById('pw-overlay').style.display = 'none';
+        // 인증된 경우: 바로 데이터 로딩
+        setLoadingSub("데이터 불러오는 중...");
+        try { await fetchAllData(30000); } catch(e){}
     } else {
+        // 미인증: 비밀번호 창 표시와 동시에 데이터 로딩 병렬 진행
+        // → 사용자가 비밀번호 입력하는 동안 데이터가 미리 로딩됨
         showPwOverlay();
-        // 비밀번호 입력 중에도 데이터 로딩 계속 진행
+        setLoadingSub("데이터 불러오는 중...");
+        try { await fetchAllData(30000); } catch(e){}
     }
 
-    // type=all 단일 호출 (settings 호출 없이 바로 데이터 로딩)
-    try {
-        const allRes = await fetchWithTimeout(API+"?type=all&v="+Date.now(), 6000);
-        if(allRes.result==="success"){
-            if(allRes.members) MEMBERS = allRes.members;
-            if(allRes.quotes)  QUOTES  = allRes.quotes;
-            if(Array.isArray(allRes.records)) db = allRes.records;
-        } else {
-            // type=all 미지원 시 개별 호출 fallback
-            const [mRes, qRes] = await Promise.all([
-                fetchWithTimeout(API+"?type=members&v="+Date.now(), 3000),
-                fetchWithTimeout(API+"?type=quotes&v="+Date.now(), 5000)
-            ]);
-            if(mRes.result==="success") MEMBERS = mRes.members;
-            if(qRes.result==="success") QUOTES  = qRes.quotes;
-            await fetchWithTimeout(API+"?type=records&v="+Date.now(), 6000)
-                .then(d=>{ if(d.result==="success"&&Array.isArray(d.records)) db=d.records; })
-                .catch(()=>{});
+    // MEMBERS 비어있으면 안내 표시 (30초 타임아웃 후에도 실패한 경우)
+    if(Object.keys(MEMBERS).length === 0){
+        showLoading(false);
+        if(selEl) selEl.disabled = false;
+        setLoadingSub("새벽을 깨우는 중...");
+        const alertEl = document.getElementById('missing-alert');
+        if(alertEl){
+            alertEl.style.display='block';
+            alertEl.style.color='#c0392b';
+            alertEl.innerText='서버 연결이 느립니다. 잠시 후 새로고침해 주세요 🔄';
         }
-    } catch(e){}
+        return;
+    }
 
     showLoading(false);
-    // 2. 로딩 완료 후 select 활성화
+    setLoadingSub("새벽을 깨우는 중...");
     if(selEl) selEl.disabled = false;
     initUI();
+}
+
+// 1. 로딩 서브 메시지 변경 헬퍼
+function setLoadingSub(msg){
+    const el=document.getElementById('loading-overlay');
+    if(!el) return;
+    const sub=el.querySelector('.loading-sub');
+    if(sub) sub.innerText=msg;
 }
 
 function fetchRecords(){
@@ -555,9 +580,10 @@ function updateCountdown(){
 // 초기화
 // ============================================================
 function initUI(){
-    const hEl = document.querySelector('.header');
-    const qEl = document.querySelector('.quote-area');
-    if(hEl && qEl){ qEl.style.position='sticky'; qEl.style.top=hEl.offsetHeight+'px'; qEl.style.zIndex='899'; }
+    // 2. quote-area sticky 제거 — 헤더/명언 포함 전체 스크롤
+    // const hEl = document.querySelector('.header');
+    // const qEl = document.querySelector('.quote-area');
+    // if(hEl && qEl){ qEl.style.position='sticky'; qEl.style.top=hEl.offsetHeight+'px'; qEl.style.zIndex='899'; }
 
     const sel=document.getElementById('userSelect');
     sel.innerHTML='<option value="">-- 성함을 선택하세요 --</option>';
@@ -650,10 +676,13 @@ function addDateChip(wrap,ds,label){
 function renderTodaySummary(){
     const today=getTodayStr();
     const memberList=Object.keys(MEMBERS).filter(n=>n!=="사랑주니");
-    const done=memberList.filter(n=>MEMBERS[n].items.some(r=>{ const s=getLatestS(n,today,r); return s==='O'||s==='⭐'; }));
+    // 2. O/X/패스(-) 상관없이 기록 하나라도 있으면 명단에 포함
+    const done=memberList.filter(n=>MEMBERS[n].items.some(r=>{
+        const s=getLatestS(n,today,r);
+        return s==='O'||s==='⭐'||s==='X'||s==='-';
+    }));
     document.getElementById('today-count').innerText=done.length+"명 / "+memberList.length+"명";
     document.getElementById('today-names').innerHTML=done.map(n=>'<span class="today-name-chip">'+n+'</span>').join('');
-    // 2. updateMyRank 호출 제거
     renderTodayRoutineChart();
 }
 
@@ -697,21 +726,47 @@ function getLatestSAdmin(name,date,routine){
     return '';
 }
 
+// 요일명 → getDay() 인덱스
+const DAY_IDX = {일:0, 월:1, 화:2, 수:3, 목:4, 금:5, 토:6};
+
 function getFreeDayType(name,ds){
-    const note=(MEMBERS[name]?.note||"").toLowerCase();
-    if(note.includes("없음")) return false;
-    const d=new Date(ds).getDay();
+    const note=(MEMBERS[name]?.note||"").trim();
+    if(!note) return false;
+
+    const d=new Date(ds).getDay(); // 0=일, 6=토
     const allHol=[...MONTH_CONFIG[5].holidays,...MONTH_CONFIG[6].holidays];
     const isHol=allHol.includes(ds);
-    let isFree=false;
-    if((note.includes("주말&연휴")||note.includes("주말&연휴 루틴 자유"))&&(d===0||d===6||isHol)) isFree=true;
-    else if(note.includes("주말 루틴 자유")&&(d===0||d===6)) isFree=true;
-    else if(note.includes("일요일 루틴 자유")&&d===0) isFree=true;
-    else if(note.includes("주말 기상")&&(d===0||d===6)) isFree=true;
-    if(!isFree) return false;
-    if(PARTIAL_FREE_ROUTINES[name]) return 'partial';
-    if(note.includes("주말 기상")&&!note.includes("루틴 자유")) return 'info';
-    return 'full';
+
+    // 확정된 6가지 패턴만 인식
+    switch(note){
+        case "없음":
+        case "운영자 루틴":
+            return false;
+
+        case "주말&연휴":
+            return (d===0||d===6||isHol) ? 'full' : false;
+
+        case "주말":
+            return (d===0||d===6) ? 'full' : false;
+
+        case "일요일":
+            return d===0 ? 'full' : false;
+
+        case "화요일":
+            return d===2 ? 'full' : false;
+
+        case "주말기상":
+            // 기상시간 루틴만 토/일 자유 (partial)
+            return (d===0||d===6) ? 'partial' : false;
+
+        case "금토취침":
+            // 취침시간 루틴만 금/토 자유 (partial)
+            return (d===5||d===6) ? 'partial' : false;
+
+        default:
+            // 정해진 패턴 외 값은 자유없음 (주말 기상 7시30분 등)
+            return false;
+    }
 }
 
 // ============================================================
@@ -736,7 +791,9 @@ function loadUser(){
     const name=currentUser; if(!name||!MEMBERS[name]) return;
     document.getElementById('userArea').style.display='block';
     document.getElementById('span-name').innerText=name;
-    document.getElementById('personal-note').innerText="📌 "+name+"님의 개인 수칙: "+(MEMBERS[name].note||"없음");
+    // H열 noteDisplay 우선 표시, 없으면 G열 note 사용
+    const noteText = MEMBERS[name].noteDisplay || MEMBERS[name].note || "없음";
+    document.getElementById('personal-note').innerText="📌 "+name+"님의 개인 수칙: "+noteText;
     checkMissingAlert(name); // 4. 미기록 알림
     calcStats(name);
     renderRoutineList(name);
@@ -759,22 +816,47 @@ function checkMissingAlert(name){
     // 6월 시작 전이면 표시 안 함
     if(today<"2026-06-01"){ el.style.display='none'; return; }
 
-    // 어제 날짜
+    // 6월 1일부터 어제까지 날짜 목록 (최신순)
     const yest=new Date(); yest.setDate(yest.getDate()-1);
     const yestStr=yest.toLocaleDateString('sv-SE');
     if(!yestStr.startsWith("2026-06")){ el.style.display='none'; return; }
 
-    // O도 X도 패스(-)도 없는 루틴만 미기록으로 표시
-    const missedRoutines=MEMBERS[name].items.filter(r=>{
-        const s=getLatestS(name,yestStr,r);
-        return s===''||s==='BEFORE_START';
+    // 6월 1일 ~ 어제 날짜 배열 (최신순)
+    const pastDates=[];
+    for(let i=1;i<=30;i++){
+        const ds=dateStr(6,i);
+        if(ds>=today) break;
+        pastDates.unshift(ds); // 최신순
+    }
+
+    // 날짜별 미체크 루틴 집계
+    const missedByDate=[];
+    pastDates.forEach(ds=>{
+        const missed=MEMBERS[name].items.filter(r=>{
+            const s=getLatestS(name,ds,r);
+            return s===''||s==='BEFORE_START';
+        });
+        if(missed.length>0) missedByDate.push({ds,missed});
     });
 
-    if(missedRoutines.length===0){ el.style.display='none'; return; }
+    if(missedByDate.length===0){ el.style.display='none'; return; }
 
-    const mm=yest.getMonth()+1, dd=yest.getDate();
+    // 표시: 어제는 루틴명 상세, 그 이전은 날짜+개수
+    let lines=[];
+    missedByDate.forEach(({ds,missed})=>{
+        const d=new Date(ds);
+        const label=(d.getMonth()+1)+'/'+(d.getDate());
+        if(ds===yestStr){
+            // 어제: 루틴명 상세 표시
+            lines.push('💡 '+label+' 미체크: '+missed.join(', '));
+        } else {
+            // 이전 날짜: 날짜 + 개수만
+            lines.push('💡 '+label+' 미체크: 항목 '+missed.length+'개');
+        }
+    });
+
     el.style.display='block';
-    el.innerHTML='💡 '+mm+'/'+dd+' 미체크:<br>'+missedRoutines.map(r=>'• '+r).join('<br>');
+    el.innerHTML=lines.join('<br>');
 }
 
 // ============================================================
@@ -785,7 +867,9 @@ function autoSaveFreeDay(name){
     if(autoSaveDate[today]?.[name]) return;
     const freeType=getFreeDayType(name,today);
     if(!freeType) return;
-    const partialList=PARTIAL_FREE_ROUTINES[name]||[];
+    // PARTIAL_FREE_ROUTINES 새 구조: {days, routines}
+    const partialEntry=PARTIAL_FREE_ROUTINES[name];
+    const partialList=partialEntry ? partialEntry.routines : [];
     MEMBERS[name].items.forEach(r=>{
         const isAutoPass=(freeType==='full')||(freeType==='partial'&&partialList.includes(r));
         if(!isAutoPass) return;
@@ -917,7 +1001,9 @@ function calcStreak(name){
 function renderRoutineList(name){
     const items=MEMBERS[name].items;
     const freeType=getFreeDayType(name,selectedDate);
-    const partialList=PARTIAL_FREE_ROUTINES[name]||[];
+    // PARTIAL_FREE_ROUTINES 새 구조: {days, routines}
+    const partialEntry=PARTIAL_FREE_ROUTINES[name];
+    const partialList=partialEntry ? partialEntry.routines : [];
     let html='';
     items.forEach(r=>{
         const s=getLatestS(name,selectedDate,r);
@@ -935,6 +1021,17 @@ function renderRoutineList(name){
         }
     });
     document.getElementById('routine-list').innerHTML=html;
+    // 3. footer-note: 자유일이면 안내 문구로 교체, 아니면 기존 문구
+    const fnEl=document.getElementById('footer-note-text');
+    if(fnEl){
+        if(freeType==='full'||freeType==='partial'){
+            fnEl.style.textAlign='center';
+            fnEl.innerHTML='📢 자유 루틴으로 설정된 항목은 자동으로 패스 처리됩니다.<br>자유일에도 실천했다면 오른쪽 ⭐를 눌러 기록해 주세요.';
+        } else {
+            fnEl.style.textAlign='center';
+            fnEl.innerHTML=''; // 비자유일: 문구 없음
+        }
+    }
 }
 
 // ============================================================
@@ -1209,9 +1306,35 @@ function renderMonthlyFlowChart(name){
 // ============================================================
 // 탭 전환
 // ============================================================
+// 3. 명언 접기/펼치기
+function toggleQuote(){
+    const content=document.getElementById('quote-content');
+    const btn=document.getElementById('quote-toggle-btn');
+    const wrap=document.getElementById('quote-area-wrap');
+    if(!content||!btn) return;
+    if(content.style.display==='none'){
+        content.style.display='block';
+        btn.innerText='▲ 접기';
+        wrap.style.padding='20px 18px';
+    } else {
+        content.style.display='none';
+        btn.innerText='▼ 펼치기';
+        wrap.style.padding='6px 18px';
+    }
+}
+
 function showTab(tab){
     if(tab==='admin'){
         if(!adminAuthed){ const pw=prompt("관리자 비밀번호를 입력하세요"); if(pw!==ADMIN_PW){ showToast("비밀번호가 틀렸습니다."); return; } adminAuthed=true; }
+        // 3. 관리자 탭 진입 시 명언 자동 접기
+        const qContent=document.getElementById('quote-content');
+        const qBtn=document.getElementById('quote-toggle-btn');
+        const qWrap=document.getElementById('quote-area-wrap');
+        if(qContent&&qContent.style.display!=='none'){
+            qContent.style.display='none';
+            if(qBtn) qBtn.innerText='▼ 펼치기';
+            if(qWrap) qWrap.style.padding='6px 18px';
+        }
         renderAdmin();
     }
     if(tab==='cal'){
