@@ -1367,7 +1367,25 @@ function showConfetti(){
     setTimeout(()=>wrap.innerHTML='',2200);
 }
 function showToast(msg){ const t=document.getElementById('toast'); t.innerText=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',3000); }
-function capture(){ html2canvas(document.querySelector("#capture-area")).then(c=>{ const l=document.createElement('a'); l.download='미라클주니_21기_'+adminMonth+'월_'+getTodayStr()+'.png'; l.href=c.toDataURL(); l.click(); }); }
+function capture(){
+    const area=document.querySelector("#capture-area");
+    // 캡처 시 행 고정(max-height/overflow) 임시 해제 → 전체 멤버 캡처
+    const origMaxH=area.style.maxHeight;
+    const origOverflow=area.style.overflow;
+    area.style.maxHeight='none';
+    area.style.overflow='visible';
+    html2canvas(area, {scrollY:-window.scrollY, windowHeight:area.scrollHeight}).then(c=>{
+        const l=document.createElement('a');
+        l.download='미라클주니_21기_'+adminMonth+'월_'+getTodayStr()+'.png';
+        l.href=c.toDataURL(); l.click();
+        // 원래 상태 복원
+        area.style.maxHeight=origMaxH;
+        area.style.overflow=origOverflow;
+    }).catch(()=>{
+        area.style.maxHeight=origMaxH;
+        area.style.overflow=origOverflow;
+    });
+}
 function exportXls(){ const wb=XLSX.utils.table_to_book(document.getElementById('admin-table')); XLSX.writeFile(wb,'미라클주니_21기_'+adminMonth+'월_'+getTodayStr()+'.xlsx'); }
 
 // ===== 시작 =====
