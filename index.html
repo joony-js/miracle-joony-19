@@ -671,12 +671,13 @@ function addDateChip(wrap,ds,label){
 }
 
 // ============================================================
-// 오늘 인증 현황 — 사랑주니 제외, 2. 실천순위 제거
+// 오늘 인증 현황 — 전체 멤버 포함 (사랑주니 포함), 2. 실천순위 제거
 // ============================================================
 function renderTodaySummary(){
     const today=getTodayStr();
-    const memberList=Object.keys(MEMBERS).filter(n=>n!=="사랑주니");
-    // 2. O/X/패스(-) 상관없이 기록 하나라도 있으면 명단에 포함
+    // 사랑주니 제외 필터 제거 — 전체 멤버 포함
+    const memberList=Object.keys(MEMBERS);
+    // O/X/패스(-) 상관없이 기록 하나라도 있으면 명단에 포함
     const done=memberList.filter(n=>MEMBERS[n].items.some(r=>{
         const s=getLatestS(n,today,r);
         return s==='O'||s==='⭐'||s==='X'||s==='-';
