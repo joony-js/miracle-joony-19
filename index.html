@@ -1176,11 +1176,23 @@ function renderAdmin(){
 function openDayModal(name,date){
     document.getElementById('modalDate').innerText='📅 '+date+' 기록 상세';
     let html='';
+    // 해당 날짜의 자유일 여부 판단
+    const freeType=getFreeDayType(name,date);
+    const partialEntry=PARTIAL_FREE_ROUTINES[name];
+    const partialList=partialEntry ? partialEntry.routines : [];
     (MEMBERS[name]?.items||[]).forEach(r=>{
         // 1. 달력 탭 모달도 calMonth 기준 pool 사용
         const s=getLatestSGrid(name,date,r);
-        const label=!s?'미기입':s==='-'?'패스':s==='⭐'?'⭐ 자발 실천':s==='BEFORE_START'?'시작 전':s;
-        const color=(s==='O'||s==='⭐')?'var(--ok)':s==='X'?'var(--no)':'#9a9890';
+        // 이 루틴이 자유일 자동패스 대상인지 확인
+        const isFreeRoutine=(freeType==='full')||(freeType==='partial'&&partialList.includes(r));
+        let label, color;
+        if(s==='O'){ label='O'; color='var(--ok)'; }
+        else if(s==='⭐'){ label='⭐ 자발 실천'; color='var(--ok)'; }
+        else if(s==='X'){ label='X'; color='var(--no)'; }
+        else if(s==='-'){ label='패스'; color='#9a9890'; }
+        else if(s==='BEFORE_START'){ label='시작 전'; color='#9a9890'; }
+        else if(isFreeRoutine){ label='자유'; color='#9a9890'; } // 자유일 + 기록 없음
+        else { label='미기입'; color='#9a9890'; }
         html+=`<div style="padding:11px 0;border-bottom:1px solid #f0ede4;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:15px;">${r}</span><b style="color:${color};font-size:15px;">${label}</b></div>`;
     });
     document.getElementById('modalBody').innerHTML=html;
