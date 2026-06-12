@@ -833,8 +833,15 @@ function checkMissingAlert(name){
     // 날짜별 미체크 루틴 집계
     const missedByDate=[];
     pastDates.forEach(ds=>{
+        // 해당 날짜의 자유일 여부 판단
+        const freeType=getFreeDayType(name,ds);
+        const partialEntry=PARTIAL_FREE_ROUTINES[name];
+        const partialList=partialEntry ? partialEntry.routines : [];
         const missed=MEMBERS[name].items.filter(r=>{
             const s=getLatestS(name,ds,r);
+            // 자유일 자동패스 대상 루틴은 미체크에서 제외
+            const isFreeRoutine=(freeType==='full')||(freeType==='partial'&&partialList.includes(r));
+            if(isFreeRoutine) return false;
             return s===''||s==='BEFORE_START';
         });
         if(missed.length>0) missedByDate.push({ds,missed});
