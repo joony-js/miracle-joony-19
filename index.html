@@ -3,6 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <!-- 25기 → 새 앱 안내: SWITCH_AT(한국시간 2026-11-01 00:00)부터 화면 전체를 덮는다. 그 전에는 아무것도 바꾸지 않는다
+         (시각 확인 요청 1건 + 1분 타이머만). 앱 기록 로직·GAS·Sheets와 무관하며, 이 블록이 오류를 내도 앱은 그대로 동작한다. -->
+    <script>
+    (function () {
+        try {
+            // ===== 상수 — 바꿀 일이 있으면 이 두 줄만 고친다 =====
+            var SWITCH_AT = "2026-11-01T00:00:00+09:00";
+            var NEW_APP_URL = "https://miracle-joony-app.vercel.app";
+            // =====================================================
+            var P = "mjSwitch";            // 이 블록이 만드는 모든 id·class의 접두사 (옛 앱 스타일·변수와 겹치지 않게)
+            var WAIT_MS = 3000;            // 서버 시각을 기다리는 최대 시간, 넘으면 기기 시계로 판단
+            var TICK_MS = 60000;           // 켜 둔 화면이 자정을 넘기는 경우를 위한 재판단 간격 (서버 요청 없이 계산)
+            var switchMs = Date.parse(SWITCH_AT);
+            if (isNaN(switchMs)) return;   // 시각을 읽을 수 없으면 아무것도 하지 않는다
+
+            var offset = 0;                // 서버 시각 − 기기 시각 (서버 시각을 받지 못하면 0 = 기기 시계)
+            var decided = false;
+            var shown = false;
+            var box = null;
+            var btn = null;
+
+            function nowMs() { return Date.now() + offset; }
+
+            function lockBackground() {
+                var b = document.body;
+                if (!b) return false;
+                b.setAttribute("inert", "");   // 마우스·터치·키보드(탭 이동 포함)·화면 읽기 모두에서 뒤 화면을 빼 준다
+                try { b.inert = true; } catch (e) {}
+                return true;
+            }
+
+            function show() {
+                if (shown) return;
+                shown = true;
+                var root = document.documentElement;
+                var css = document.createElement("style");
+                css.id = P + "_style";
+                css.textContent =
+                    "html." + P + "_lock,html." + P + "_lock body{overflow:hidden!important}" +
+                    "#" + P + "_overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483647;background:#F5F1E8;" +
+                    "display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;overflow:auto;" +
+                    "font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif;color:#2C3E6B}" +
+                    "#" + P + "_overlay *{box-sizing:border-box}" +
+                    "#" + P + "_card{width:100%;max-width:360px;margin:auto;text-align:center}" +
+                    "#" + P + "_title{font-size:22px;line-height:1.4;font-weight:800;margin:0 0 14px;word-break:keep-all}" +
+                    "#" + P + "_body{font-size:15px;line-height:1.7;margin:0 0 26px;color:#3a3a3a;word-break:keep-all}" +
+                    "#" + P + "_btn{display:block;width:100%;padding:16px 12px;border-radius:14px;background:#2C3E6B;color:#fff;" +
+                    "font-size:17px;font-weight:700;text-decoration:none;text-align:center}" +
+                    "#" + P + "_btn:focus{outline:3px solid #F1C40F;outline-offset:2px}" +
+                    "#" + P + "_note{font-size:12.5px;line-height:1.7;margin:18px 0 0;color:#6b6b6b;word-break:keep-all}";
+                root.appendChild(css);
+
+                box = document.createElement("div");
+                box.id = P + "_overlay";
+                box.setAttribute("role", "alertdialog");
+                box.setAttribute("aria-modal", "true");
+                box.setAttribute("aria-labelledby", P + "_title");
+                box.setAttribute("aria-describedby", P + "_body");
+                var card = document.createElement("div");
+                card.id = P + "_card";
+                var title = document.createElement("h1");
+                title.id = P + "_title";
+                title.textContent = "26기부터는 새 앱에서 만나요";
+                var body = document.createElement("p");
+                body.id = P + "_body";
+                body.textContent = "25기 앱은 10월 31일까지 쓰는 앱이에요. 새 앱에서 닉네임으로 들어와 주세요.";
+                btn = document.createElement("a");
+                btn.id = P + "_btn";
+                btn.href = NEW_APP_URL;
+                btn.textContent = "새 앱으로 가기";
+                var note = document.createElement("p");
+                note.id = P + "_note";
+                note.textContent = "홈 화면에 있는 바로가기는 새 주소로 다시 추가해 주세요.";
+                card.appendChild(title);
+                card.appendChild(body);
+                card.appendChild(btn);
+                card.appendChild(note);
+                box.appendChild(card);
+                root.appendChild(box);
+                root.className = (root.className ? root.className + " " : "") + P + "_lock";
+
+                // 뒤 화면은 마우스·터치·키보드(탭 이동 포함) 모두 막는다. 닫기 수단은 없다.
+                if (!lockBackground()) document.addEventListener("DOMContentLoaded", lockBackground);
+                document.addEventListener("keydown", function (e) {
+                    if (e.key === "Tab") { e.preventDefault(); btn.focus(); }
+                }, true);
+                document.addEventListener("focusin", function (e) {
+                    if (box && !box.contains(e.target)) btn.focus();
+                }, true);
+                btn.focus();
+            }
+
+            function check() {
+                try { if (!shown && nowMs() >= switchMs) show(); } catch (e) {}
+            }
+
+            function decide() {
+                if (decided) return;
+                decided = true;
+                check();
+                if (shown) return;
+                setInterval(check, TICK_MS);
+                // 폰이 잠들었다 깨어나는 경우 등: 다시 보일 때 바로 재판단 (서버 요청 없음)
+                document.addEventListener("visibilitychange", check);
+                window.addEventListener("pageshow", check);
+                window.addEventListener("focus", check);
+            }
+
+            // 서버 시각: 같은 사이트 주소로 HEAD 요청(캐시 안 씀, 매번 다른 쿼리)을 보내 응답 Date 헤더를 읽는다.
+            function readServerTime(done) {
+                var finished = false;
+                function finish(serverMs, sentAt, receivedAt) {
+                    if (finished) return;
+                    finished = true;
+                    done(serverMs, sentAt, receivedAt);
+                }
+                try {
+                    var sentAt = Date.now();
+                    // (Math.random은 쓰지 않는다: 옛 앱의 난수 흐름을 건드리지 않으려고)
+                    var uniq = (typeof performance !== "undefined" && performance.now) ? Math.round(performance.now() * 1000) : 0;
+                    var url = location.pathname + "?mj_switch_t=" + sentAt + "_" + uniq;
+                    var opts = { method: "HEAD", cache: "no-store" };
+                    var ctl = null;
+                    try { ctl = new AbortController(); opts.signal = ctl.signal; } catch (e) {}
+                    setTimeout(function () { try { if (ctl) ctl.abort(); } catch (e) {} finish(null); }, WAIT_MS);
+                    fetch(url, opts).then(function (res) {
+                        var received = Date.now();
+                        var dateHeader = res.headers.get("Date");
+                        var ms = dateHeader ? Date.parse(dateHeader) : NaN;
+                        if (isNaN(ms)) { finish(null); return; }
+                        var age = parseInt(res.headers.get("Age") || "0", 10);
+                        finish(ms + (age > 0 ? age * 1000 : 0), sentAt, received);
+                    }, function () { finish(null); });
+                } catch (e) { finish(null); }
+            }
+
+            readServerTime(function (serverMs, sentAt, receivedAt) {
+                try {
+                    if (decided) return;
+                    // Date 헤더는 초 단위로 잘려 있다: 요청이 오간 한가운데 순간의 서버 시각 ≈ serverMs + 500ms
+                    if (serverMs !== null) offset = (serverMs + 500) - (sentAt + receivedAt) / 2;
+                    decide();
+                } catch (e) {}
+            });
+        } catch (e) {}
+    })();
+    </script>
     <title>미라클 주니 통합센터</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
